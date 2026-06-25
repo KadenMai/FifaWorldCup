@@ -413,8 +413,8 @@
     "homeTeamId": "curacao",
     "awayTeamId": "ivory-coast",
     "homeScore": 0,
-    "awayScore": 1,
-    "status": "Live",
+    "awayScore": 2,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "E",
     "stadiumId": "lincoln-financial"
