@@ -398,9 +398,9 @@
     "timezone": "America/New_York",
     "homeTeamId": "ecuador",
     "awayTeamId": "germany",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "E",
     "stadiumId": "metlife-stadium"
