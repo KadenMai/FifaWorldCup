@@ -1,7 +1,9 @@
 import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useLanguage, useT } from '../context/LanguageContext';
 import GoogleSportsPanel from '../components/GoogleSportsPanel';
+import MatchScoreModal from '../components/MatchScoreModal';
 import WeatherCard from '../components/WeatherCard';
 import { ErrorState, LoadingState } from '../components/PageState';
 import TeamFlag from '../components/TeamFlag';
@@ -9,9 +11,10 @@ import { formatDate, formatMatchTime, getMatchWinner, getTeamById } from '../uti
 
 export default function MatchDetailPage() {
   const { matchId } = useParams<{ matchId: string }>();
-  const { data, loading, error } = useData();
+  const { data, loading, error, applyScoreUpdate } = useData();
   const t = useT();
   const { locale } = useLanguage();
+  const [scoreModalOpen, setScoreModalOpen] = useState(false);
 
   if (loading) return <LoadingState />;
   if (error || !data) return <ErrorState message={error ?? undefined} />;
@@ -43,7 +46,7 @@ export default function MatchDetailPage() {
 
   const scoreDisplay =
     match.status === 'Scheduled'
-      ? formatMatchTime(match.date, match.time, match.timezone, locale)
+      ? 'vs'
       : `${match.homeScore ?? '-'} - ${match.awayScore ?? '-'}`;
 
   return (
@@ -71,12 +74,14 @@ export default function MatchDetailPage() {
               </span>
             </div>
 
-            <div
-              className={`g-match-hero-score${isLive ? ' live' : ''}`}
-              style={isLive ? { color: 'var(--google-live)' } : undefined}
+            <button
+              type="button"
+              className={`g-match-hero-score g-match-score-btn${isLive ? ' live' : ''}`}
+              title={t('admin.tapToUpdate')}
+              onClick={() => setScoreModalOpen(true)}
             >
               {scoreDisplay}
-            </div>
+            </button>
 
             <div className="g-match-hero-team">
               <span className="g-match-hero-flag">
@@ -146,6 +151,15 @@ export default function MatchDetailPage() {
           <WeatherCard weather={matchWeather} stadium={stadium} />
         </div>
       )}
+
+      <MatchScoreModal
+        match={match}
+        home={home}
+        away={away}
+        open={scoreModalOpen}
+        onClose={() => setScoreModalOpen(false)}
+        onSaved={applyScoreUpdate}
+      />
     </div>
   );
 }

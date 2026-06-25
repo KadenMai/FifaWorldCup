@@ -11,8 +11,18 @@ import type {
 /** Bump when JSON data changes to bust browser/CDN cache */
 const DATA_VERSION = '3';
 
+let runtimeDataVersion = DATA_VERSION;
+
+export function setRuntimeDataVersion(version: string): void {
+  runtimeDataVersion = version;
+}
+
+export function getRuntimeDataVersion(): string {
+  return runtimeDataVersion;
+}
+
 export async function loadJson<T>(fileName: string): Promise<T> {
-  const url = `${import.meta.env.BASE_URL}data/${fileName}?v=${DATA_VERSION}`;
+  const url = `${import.meta.env.BASE_URL}data/${fileName}?v=${runtimeDataVersion}`;
   const response = await fetch(url, { cache: 'no-store' });
 
   if (!response.ok) {

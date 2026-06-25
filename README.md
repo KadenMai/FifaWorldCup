@@ -56,7 +56,26 @@ Or create an empty project named `fifaworldcup` in the Cloudflare dashboard.
 
 Site URL: `https://fifaworldcup.pages.dev` (or your custom domain in Cloudflare).
 
-### 3. AWS Lambda (one-time + auto on push)
+#### In-page score updates (Cloudflare Pages Function)
+
+The site includes a **Pages Function** at `/api/update-match` (folder `functions/`). On each match row, tap the **score / vs** between the flags to open a popup and save.
+
+**Cloudflare dashboard → Pages → your project → Settings → Environment variables** (Production):
+
+| Name | Value |
+|------|--------|
+| `GITHUB_TOKEN` | GitHub PAT with **Contents: write** on this repo |
+| `GITHUB_REPO` | `KadenMai/FifaWorldCup` |
+| `GITHUB_BRANCH` | `main` |
+| `ADMIN_API_KEY` | long random secret — enter the same value in the popup |
+
+After saving env vars, **redeploy** the Pages project (new deployment required for functions to pick up secrets).
+
+Test health: `GET https://your-site.pages.dev/api/health`
+
+**Note:** Score editing works on the deployed Cloudflare site, not `npm run dev` (unless you run `npx wrangler pages dev`).
+
+### 3. AWS Lambda (optional — skip if using Cloudflare Function above)
 
 IAM user for GitHub Actions needs: `AWSCloudFormationFullAccess`, `AWSLambda_FullAccess`, `AmazonS3FullAccess` (SAM uses a staging bucket), `IAMFullAccess` (SAM creates execution role). For production, tighten to a dedicated deploy role.
 

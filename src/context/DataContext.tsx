@@ -1,16 +1,25 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { loadAllData, type AppData } from '../data/dataLoader';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { loadAllData, setRuntimeDataVersion, type AppData } from '../data/dataLoader';
+import type { Match, Standing } from '../types';
+
+interface ScoreUpdateResult {
+  match: Match;
+  standings: Standing[];
+  dataVersion?: string;
+}
 
 interface DataContextValue {
   data: AppData | null;
   loading: boolean;
   error: string | null;
+  applyScoreUpdate: (result: ScoreUpdateResult) => void;
 }
 
 const DataContext = createContext<DataContextValue>({
   data: null,
   loading: true,
   error: null,
+  applyScoreUpdate: () => {},
 });
 
 export function DataProvider({ children }: { children: ReactNode }) {
@@ -25,8 +34,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
+  const applyScoreUpdate = useCallback((result: ScoreUpdateResult) => {
+    if (result.dataVersion) {
+      setRuntimeDataVersion(result.dataVersion);
+    }
+    setData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        matches: prev.matches.map((match) =>
+          match.id === result.match.id ? { ...match, ...result.match } : match
+        ),
+        standings: result.standings,
+      };
+    });
+  }, []);
+
   return (
-    <DataContext.Provider value={{ data, loading, error }}>
+    <DataContext.Provider value={{ data, loading, error, applyScoreUpdate }}>
       {children}
     </DataContext.Provider>
   );
