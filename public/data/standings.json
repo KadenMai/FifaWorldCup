@@ -206,14 +206,14 @@
   {
     "group": "E",
     "teamId": "ivory-coast",
-    "played": 2,
-    "won": 1,
+    "played": 3,
+    "won": 2,
     "drawn": 0,
     "lost": 1,
-    "goalsFor": 2,
+    "goalsFor": 3,
     "goalsAgainst": 2,
-    "goalDifference": 0,
-    "points": 3
+    "goalDifference": 1,
+    "points": 6
   },
   {
     "group": "E",
@@ -230,13 +230,13 @@
   {
     "group": "E",
     "teamId": "curacao",
-    "played": 2,
+    "played": 3,
     "won": 0,
     "drawn": 1,
-    "lost": 1,
+    "lost": 2,
     "goalsFor": 1,
-    "goalsAgainst": 7,
-    "goalDifference": -6,
+    "goalsAgainst": 8,
+    "goalDifference": -7,
     "points": 1
   },
   {
