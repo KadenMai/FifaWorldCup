@@ -77,6 +77,7 @@ export const en = {
   },
   admin: {
     tapToUpdate: 'Tap to update score',
+    updateButton: 'Update',
     updateScore: 'Update match score',
     home: 'Home',
     away: 'Away',
@@ -253,6 +254,7 @@ export const vi: TranslationDict = {
   },
   admin: {
     tapToUpdate: 'Chạm để cập nhật tỉ số',
+    updateButton: 'Cập nhật',
     updateScore: 'Cập nhật tỉ số',
     home: 'Nhà',
     away: 'Khách',

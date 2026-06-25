@@ -89,24 +89,28 @@ export default function GoogleMatchRow({
             <span className="g-match-team-name">{home?.name ?? match.homeTeamId}</span>
           </span>
 
-          <button
-            type="button"
-            className={`g-match-score-inline g-match-score-btn${isLive ? ' live' : ''}${isScheduled ? ' scheduled' : ''}`}
-            title={t('admin.tapToUpdate')}
-            aria-label={t('admin.tapToUpdate')}
-            onClick={(event) => {
-              event.stopPropagation();
-              setScoreModalOpen(true);
-            }}
+          <span
+            className={`g-match-score-inline${isLive ? ' live' : ''}${isScheduled ? ' scheduled' : ''}`}
           >
             {scoreDisplay}
-          </button>
+          </span>
 
           <span className={`g-match-team-inline away${winner?.id === away?.id ? ' winner' : ''}`}>
             <span className="g-match-team-name">{away?.name ?? match.awayTeamId}</span>
             <TeamFlag team={away} size={22} />
           </span>
         </div>
+
+        <button
+          type="button"
+          className="g-match-update-btn"
+          onClick={(event) => {
+            event.stopPropagation();
+            setScoreModalOpen(true);
+          }}
+        >
+          {t('admin.updateButton')}
+        </button>
 
         {showMeta && stadium && (
           <div className="g-match-meta">

@@ -1081,23 +1081,38 @@ a {
   cursor: pointer;
 }
 
-.g-match-score-btn {
+.g-match-update-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 12px 20px;
   border: none;
-  background: transparent;
-  font: inherit;
+  border-radius: 12px;
+  background: var(--google-blue);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
-.g-match-score-btn:hover,
-.g-match-score-btn:focus-visible {
-  background: rgba(26, 115, 232, 0.08);
-  outline: none;
+.g-match-update-btn:hover {
+  background: #1765cc;
 }
 
-.g-match-hero-score.g-match-score-btn.live {
-  color: var(--google-live);
+.g-match-update-btn:active {
+  transform: scale(0.98);
+}
+
+.g-match-update-btn-hero {
+  max-width: 280px;
+  margin: 16px auto 0;
 }
 
 .g-modal-backdrop {

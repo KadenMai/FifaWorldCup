@@ -74,14 +74,12 @@ export default function MatchDetailPage() {
               </span>
             </div>
 
-            <button
-              type="button"
-              className={`g-match-hero-score g-match-score-btn${isLive ? ' live' : ''}`}
-              title={t('admin.tapToUpdate')}
-              onClick={() => setScoreModalOpen(true)}
+            <div
+              className={`g-match-hero-score${isLive ? ' live' : ''}`}
+              style={isLive ? { color: 'var(--google-live)' } : undefined}
             >
               {scoreDisplay}
-            </button>
+            </div>
 
             <div className="g-match-hero-team">
               <span className="g-match-hero-flag">
@@ -92,6 +90,14 @@ export default function MatchDetailPage() {
               </span>
             </div>
           </div>
+
+          <button
+            type="button"
+            className="g-match-update-btn g-match-update-btn-hero"
+            onClick={() => setScoreModalOpen(true)}
+          >
+            {t('admin.updateButton')}
+          </button>
 
           {winner && (
             <p style={{ color: 'var(--google-blue)', fontWeight: 500, fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
