@@ -62,9 +62,9 @@
     "timezone": "America/Mexico_City",
     "homeTeamId": "czechia",
     "awayTeamId": "mexico",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 0,
+    "awayScore": 3,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "A",
     "stadiumId": "azteca"
