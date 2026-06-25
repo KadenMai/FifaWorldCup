@@ -98,7 +98,15 @@ def api_get(path: str, api_key: str, params: dict[str, Any] | None = None) -> di
     payload = response.json()
 
     if payload.get("errors"):
-        raise RuntimeError(f"API-Football error on {path}: {payload['errors']}")
+        errors = payload["errors"]
+        if isinstance(errors, dict) and "plan" in errors:
+            raise RuntimeError(
+                f"API-Football plan error: {errors}\n"
+                "Free plan cannot access World Cup 2026 (season 2026). "
+                "Upgrade to Pro ($19/mo) at https://www.api-football.com/pricing "
+                "or keep using static data: node scripts/generate-fifa2026-data.mjs"
+            )
+        raise RuntimeError(f"API-Football error on {path}: {errors}")
 
     remaining = response.headers.get("x-ratelimit-requests-remaining")
     if remaining is not None:

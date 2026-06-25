@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "sync:teams": "python scripts/build_team_map.py",
-    "sync:data": "python scripts/sync_api_football.py"
+    "update:match": "python scripts/manual_update_match.py"
   },
   "dependencies": {
     "d3": "^7.9.0",

@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "GITHUB_TOKEN": "ghp_your_token_with_repo_contents_write",
+    "GITHUB_REPO": "your-username/FifaWorldCup",
+    "GITHUB_BRANCH": "main",
+    "ADMIN_API_KEY": "choose-a-long-random-secret"
+  }
+}
