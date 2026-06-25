@@ -76,9 +76,9 @@
     "timezone": "America/Monterrey",
     "homeTeamId": "south-africa",
     "awayTeamId": "south-korea",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "A",
     "stadiumId": "bbva"
