@@ -5,19 +5,14 @@ $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $Package = Join-Path $Root "package"
 $Zip = Join-Path $Root "lambda.zip"
-$Shared = Join-Path $Root "..\azure-functions\shared"
-
-if (-not (Test-Path $Shared)) {
-    throw "Missing shared modules at $Shared"
-}
 
 if (Test-Path $Package) { Remove-Item -Recurse -Force $Package }
 New-Item -ItemType Directory -Path $Package | Out-Null
 
 pip install -r (Join-Path $Root "requirements.txt") -t $Package --quiet
 Copy-Item (Join-Path $Root "lambda_handler.py") $Package
-Copy-Item (Join-Path $Shared "github_store.py") $Package
-Copy-Item (Join-Path $Shared "score_update_lib.py") $Package
+Copy-Item (Join-Path $Root "github_store.py") $Package
+Copy-Item (Join-Path $Root "score_update_lib.py") $Package
 
 if (Test-Path $Zip) { Remove-Item -Force $Zip }
 Compress-Archive -Path (Join-Path $Package "*") -DestinationPath $Zip

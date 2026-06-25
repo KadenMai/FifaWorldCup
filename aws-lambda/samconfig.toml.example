@@ -1,0 +1,12 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "fifaworldcup-score-api"
+resolve_s3 = true
+s3_prefix = "fifaworldcup-score-api"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "GitHubRepo=\"YOUR_USERNAME/FifaWorldCup\" GitHubBranch=\"main\""
+# Set secrets via env or CLI — do not commit real tokens:
+#   GitHubToken=... AdminApiKey=...

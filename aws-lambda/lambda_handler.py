@@ -1,15 +1,15 @@
 """
 AWS Lambda handler — remote score updates via GitHub API.
 
-Deploy package must include (see package.ps1):
-  lambda_handler.py, github_store.py, score_update_lib.py, requests/
+Upload a .zip (not a single file). The zip must contain:
+  lambda_handler.py, github_store.py, score_update_lib.py, requests/ (+ deps)
+
+Easiest: run package.ps1 in this folder, then upload lambda.zip.
+
+Handler setting in AWS: lambda_handler.handler
 
 Environment variables:
   GITHUB_TOKEN, GITHUB_REPO, GITHUB_BRANCH (default main), ADMIN_API_KEY
-
-Routes (Lambda Function URL or API Gateway):
-  GET  / or /health        → health check
-  POST / or /update-match  → update one match
 """
 
 from __future__ import annotations

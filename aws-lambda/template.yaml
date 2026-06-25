@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: FIFA World Cup score update API (commits JSON to GitHub)
+
+Parameters:
+  GitHubToken:
+    Type: String
+    NoEcho: true
+    Description: GitHub PAT with Contents read/write on the repo
+  GitHubRepo:
+    Type: String
+    Description: owner/repo (e.g. YourName/FifaWorldCup)
+  GitHubBranch:
+    Type: String
+    Default: main
+  AdminApiKey:
+    Type: String
+    NoEcho: true
+    Description: Secret sent as X-Admin-Key header on POST
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+
+Resources:
+  ScoreUpdateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fifaworldcup-score-api
+      Handler: lambda_handler.handler
+      Description: Update match scores and commit to GitHub
+      CodeUri: .
+      Environment:
+        Variables:
+          GITHUB_TOKEN: !Ref GitHubToken
+          GITHUB_REPO: !Ref GitHubRepo
+          GITHUB_BRANCH: !Ref GitHubBranch
+          ADMIN_API_KEY: !Ref AdminApiKey
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - '*'
+          AllowMethods:
+            - GET
+            - POST
+            - OPTIONS
+          AllowHeaders:
+            - Content-Type
+            - X-Admin-Key
+
+Outputs:
+  FunctionUrl:
+    Description: POST match updates here (header X-Admin-Key)
+    Value: !GetAtt ScoreUpdateFunctionUrl.FunctionUrl
+  FunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt ScoreUpdateFunction.Arn

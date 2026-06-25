@@ -1,6 +1,6 @@
 # FIFA World Cup 2026 Hub
 
-Static React app for World Cup 2026 — **free GitHub Pages** hosting, **manual score updates** (no paid API).
+Static React app for World Cup 2026 — host on **Cloudflare Pages** or GitHub Pages, **manual score updates** via AWS Lambda (no paid API).
 
 ---
 
@@ -11,7 +11,91 @@ npm install
 npm run dev
 ```
 
-Enable **GitHub Pages**: Settings → Pages → Source: **GitHub Actions** (uses `deploy-pages.yml`).
+**Hosting (pick one):**
+
+| Platform | Auto-deploy workflow |
+|----------|----------------------|
+| **Cloudflare Pages** (recommended) | `deploy-cloudflare-pages.yml` |
+| GitHub Pages | `deploy-pages.yml` — Settings → Pages → Source: **GitHub Actions** |
+
+---
+
+## Auto-deploy: Cloudflare Pages + AWS Lambda
+
+Push to `main` → GitHub Actions deploys the **website** to Cloudflare and the **score API** to AWS Lambda.
+
+### 1. GitHub repository secrets
+
+Repo → **Settings → Secrets and variables → Actions**:
+
+| Secret | Used for |
+|--------|----------|
+| `CLOUDFLARE_API_TOKEN` | Deploy site to Cloudflare Pages |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID (dashboard URL) |
+| `AWS_ACCESS_KEY_ID` | Deploy Lambda |
+| `AWS_SECRET_ACCESS_KEY` | Deploy Lambda |
+| `AWS_REGION` | e.g. `us-east-1` |
+| `SCORE_API_GITHUB_TOKEN` | Lambda PAT — **Contents: write** on this repo |
+| `SCORE_API_ADMIN_KEY` | Random secret — send as `X-Admin-Key` when updating scores |
+
+Optional **variable** (not secret): `CLOUDFLARE_PAGES_PROJECT` — default `fifaworldcup`.
+
+### 2. Cloudflare (one-time)
+
+1. [Create API token](https://dash.cloudflare.com/profile/api-tokens) → template **Edit Cloudflare Workers** or custom with **Account → Cloudflare Pages → Edit**.
+2. Copy **Account ID** from Cloudflare dashboard (right sidebar).
+3. Create Pages project (first deploy can do this):
+
+```powershell
+npx wrangler pages project create fifaworldcup --production-branch=main
+```
+
+Or create an empty project named `fifaworldcup` in the Cloudflare dashboard.
+
+4. Push to `main` — workflow `Deploy Cloudflare Pages` builds `dist/` and deploys.
+
+Site URL: `https://fifaworldcup.pages.dev` (or your custom domain in Cloudflare).
+
+### 3. AWS Lambda (one-time + auto on push)
+
+IAM user for GitHub Actions needs: `AWSCloudFormationFullAccess`, `AWSLambda_FullAccess`, `AmazonS3FullAccess` (SAM uses a staging bucket), `IAMFullAccess` (SAM creates execution role). For production, tighten to a dedicated deploy role.
+
+1. Add AWS secrets (step 1).
+2. Push any change under `aws-lambda/` — workflow `Deploy AWS Lambda` runs SAM:
+
+```
+sam build → sam deploy → stack fifaworldcup-score-api
+```
+
+3. After first successful run, open the workflow **Summary** for the **Function URL**, or:
+
+```powershell
+aws cloudformation describe-stacks --stack-name fifaworldcup-score-api `
+  --query "Stacks[0].Outputs[?OutputKey=='FunctionUrl'].OutputValue" --output text
+```
+
+**Local first deploy (optional):**
+
+```powershell
+cd aws-lambda
+sam build
+sam deploy --guided
+# Use same parameter names as template.yaml
+```
+
+### 4. Update score via Lambda (after deploy)
+
+```powershell
+$headers = @{
+  "Content-Type" = "application/json"
+  "X-Admin-Key"  = "YOUR_SCORE_API_ADMIN_KEY"
+}
+$body = @{ matchId = "match-001"; homeScore = 2; awayScore = 1; status = "Finished" } | ConvertTo-Json
+
+Invoke-RestMethod -Method POST -Uri "YOUR_FUNCTION_URL" -Headers $headers -Body $body
+```
+
+Lambda commits to GitHub → Cloudflare Pages workflow redeploys the site with new scores.
 
 ---
 
@@ -172,6 +256,19 @@ Same as Azure Option B — fine-grained PAT with **Contents: write** on this rep
 
 #### 3. Build and upload zip
 
+**Do not paste only `lambda_handler.py` in the Lambda code editor** — it imports other modules and `requests`, which are not in the Lambda runtime. You must upload a **.zip**.
+
+Files in `aws-lambda/`:
+
+| File | Required |
+|------|----------|
+| `lambda_handler.py` | Yes |
+| `github_store.py` | Yes |
+| `score_update_lib.py` | Yes |
+| `requests` (from pip) | Yes — included in zip by script below |
+
+**Recommended — build zip:**
+
 ```powershell
 cd aws-lambda
 .\package.ps1
@@ -179,7 +276,8 @@ cd aws-lambda
 
 Upload `aws-lambda/lambda.zip` in the Lambda console (**Upload from** → `.zip file`).
 
-Set **Handler** to: `lambda_handler.handler`
+Set **Handler** to: `lambda_handler.handler`  
+Set **Runtime** to match your zip (e.g. Python 3.12).
 
 #### 4. Update a score via HTTP
 
@@ -224,7 +322,8 @@ Knockout bracket is derived from group results + fixture rules in code.
 
 | Part | Service | Cost |
 |------|---------|------|
-| Website | GitHub Pages | Free |
+| Website | Cloudflare Pages or GitHub Pages | Free |
+| Score API | AWS Lambda (auto-deploy) | Free tier |
 | Data storage | JSON in GitHub repo | Free |
 | Manual update (local) | Python script | Free |
 | Manual update (remote) | Azure Functions or AWS Lambda | Free tier |
@@ -248,7 +347,9 @@ See `scripts/sync_api_football.py` and workflow `sync-api-football.yml` (disable
 | `scripts/manual_update_match.py` | Update one match locally |
 | `scripts/generate-fifa2026-data.mjs` | Regenerate all seed data |
 | `azure-functions/` | HTTP API for remote score updates (Azure) |
-| `aws-lambda/` | HTTP API for remote score updates (AWS Lambda) |
+| `aws-lambda/` | Score API + SAM template (`template.yaml`) |
+| `.github/workflows/deploy-cloudflare-pages.yml` | Auto-deploy site to Cloudflare |
+| `.github/workflows/deploy-aws-lambda.yml` | Auto-deploy Lambda on `aws-lambda/` changes |
 
 ---
 
@@ -268,6 +369,9 @@ node scripts/generate-fifa2026-data.mjs
 | `Match not found` | Use id from `matches.json` (e.g. `match-001`) |
 | Azure / Lambda `Unauthorized` | Send header `X-Admin-Key` matching `ADMIN_API_KEY` |
 | GitHub push from API fails | PAT needs **Contents: write** on the repo |
+| Cloudflare deploy skipped | Add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets |
+| Lambda deploy skipped | Add `SCORE_API_GITHUB_TOKEN` and `SCORE_API_ADMIN_KEY` secrets |
+| Lambda `Unable to import module` | Use GitHub Actions deploy (SAM build), not a single pasted file |
 | Lambda timeout | Set timeout to 30s; check `GITHUB_TOKEN` and repo name |
 | Pages not updating | Settings → Pages → source must be **GitHub Actions** |
 

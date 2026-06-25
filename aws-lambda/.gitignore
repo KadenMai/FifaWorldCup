@@ -1,2 +1,4 @@
 package/
 lambda.zip
+.aws-sam/
+samconfig.toml

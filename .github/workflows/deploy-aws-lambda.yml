@@ -1,0 +1,68 @@
+name: Deploy AWS Lambda
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'aws-lambda/**'
+      - '.github/workflows/deploy-aws-lambda.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: SAM build
+        working-directory: aws-lambda
+        run: sam build
+
+      - name: SAM deploy
+        working-directory: aws-lambda
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCORE_API_GITHUB_TOKEN }}
+          ADMIN_API_KEY: ${{ secrets.SCORE_API_ADMIN_KEY }}
+        run: |
+          if [ -z "$GITHUB_TOKEN" ] || [ -z "$ADMIN_API_KEY" ]; then
+            echo "Skip: set SCORE_API_GITHUB_TOKEN and SCORE_API_ADMIN_KEY in repo secrets."
+            exit 0
+          fi
+          sam deploy \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name fifaworldcup-score-api \
+            --resolve-s3 \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides \
+              "GitHubToken=${GITHUB_TOKEN}" \
+              "GitHubRepo=${{ github.repository }}" \
+              "GitHubBranch=${{ github.ref_name }}" \
+              "AdminApiKey=${ADMIN_API_KEY}"
+
+      - name: Print Function URL
+        continue-on-error: true
+        run: |
+          URL=$(aws cloudformation describe-stacks \
+            --stack-name fifaworldcup-score-api \
+            --query "Stacks[0].Outputs[?OutputKey=='FunctionUrl'].OutputValue" \
+            --output text 2>/dev/null || true)
+          if [ -n "$URL" ] && [ "$URL" != "None" ]; then
+            echo "Function URL: $URL"
+            echo "### Lambda Function URL" >> "$GITHUB_STEP_SUMMARY"
+            echo "\`$URL\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
