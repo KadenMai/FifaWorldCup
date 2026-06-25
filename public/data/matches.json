@@ -412,9 +412,9 @@
     "timezone": "America/New_York",
     "homeTeamId": "curacao",
     "awayTeamId": "ivory-coast",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "Live",
     "round": "Group Stage",
     "group": "E",
     "stadiumId": "lincoln-financial"
