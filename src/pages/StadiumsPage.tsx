@@ -13,20 +13,26 @@ export default function StadiumsPage() {
   const [countryFilter, setCountryFilter] = useState('all');
   const t = useT();
 
-  if (loading) return <LoadingState />;
-  if (error || !data) return <ErrorState message={error ?? undefined} />;
-
-  const { stadiums, matches, weather } = data;
+  const stadiums = data?.stadiums ?? [];
+  const matches = data?.matches ?? [];
+  const weather = data?.weather ?? [];
 
   const countries = useMemo(
     () => ['all', ...Array.from(new Set(stadiums.map((s) => s.country))).sort()],
-    [stadiums]
+    [stadiums],
   );
 
-  const countryTabs = countries.map((c) => ({
-    id: c,
-    label: c === 'all' ? t('common.allCountries') : c,
-  }));
+  const countryTabs = useMemo(
+    () =>
+      countries.map((c) => ({
+        id: c,
+        label: c === 'all' ? t('common.allCountries') : c,
+      })),
+    [countries, t],
+  );
+
+  if (loading) return <LoadingState />;
+  if (error || !data) return <ErrorState message={error ?? undefined} />;
 
   const filtered = stadiums.filter((stadium) => {
     const q = search.toLowerCase();

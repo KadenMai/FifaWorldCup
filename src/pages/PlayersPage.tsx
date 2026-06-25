@@ -20,28 +20,33 @@ export default function PlayersPage() {
   const [positionFilter, setPositionFilter] = useState('all');
   const t = useT();
 
-  if (loading) return <LoadingState />;
-  if (error || !data) return <ErrorState message={error ?? undefined} />;
-
-  const { teams, players } = data;
+  const teams = data?.teams ?? [];
+  const players = data?.players ?? [];
 
   const teamTabs = useMemo(
     () => [
       { id: 'all', label: t('common.allTeams') },
       ...teams.map((tm) => ({ id: tm.id, label: tm.shortName })),
     ],
-    [teams, t]
+    [teams, t],
   );
 
   const positions = useMemo(
     () => ['all', ...Array.from(new Set(players.map((p) => p.position).filter(Boolean)))],
-    [players]
+    [players],
   );
 
-  const positionTabs = positions.map((p) => ({
-    id: p as string,
-    label: p === 'all' ? t('common.allPositions') : translatePosition(t, p as string),
-  }));
+  const positionTabs = useMemo(
+    () =>
+      positions.map((p) => ({
+        id: p as string,
+        label: p === 'all' ? t('common.allPositions') : translatePosition(t, p as string),
+      })),
+    [positions, t],
+  );
+
+  if (loading) return <LoadingState />;
+  if (error || !data) return <ErrorState message={error ?? undefined} />;
 
   const filtered = players.filter((player) => {
     const team = getTeamById(teams, player.teamId);

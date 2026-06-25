@@ -12,20 +12,26 @@ export default function TeamsPage() {
   const [groupFilter, setGroupFilter] = useState('all');
   const t = useT();
 
-  if (loading) return <LoadingState />;
-  if (error || !data) return <ErrorState message={error ?? undefined} />;
-
-  const { teams, coaches, matches } = data;
+  const teams = data?.teams ?? [];
+  const coaches = data?.coaches ?? [];
+  const matches = data?.matches ?? [];
 
   const groups = useMemo(
     () => ['all', ...Array.from(new Set(teams.map((tm) => tm.group).filter(Boolean))).sort()],
-    [teams]
+    [teams],
   );
 
-  const groupTabs = groups.map((g) => ({
-    id: g as string,
-    label: g === 'all' ? t('common.allGroups') : `${t('common.group')} ${g}`,
-  }));
+  const groupTabs = useMemo(
+    () =>
+      groups.map((g) => ({
+        id: g as string,
+        label: g === 'all' ? t('common.allGroups') : `${t('common.group')} ${g}`,
+      })),
+    [groups, t],
+  );
+
+  if (loading) return <LoadingState />;
+  if (error || !data) return <ErrorState message={error ?? undefined} />;
 
   const filtered = teams.filter((team) => {
     const q = search.toLowerCase();

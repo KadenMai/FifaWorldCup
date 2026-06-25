@@ -155,6 +155,10 @@ export const en = {
     subtitle: '{{count}} host venues across North America',
     searchPlaceholder: 'Search stadiums...',
     mapTitle: 'Host Stadium Map',
+    mapHint: 'Scroll to zoom · Drag to pan · Use +/− buttons',
+    mapZoomIn: 'Zoom in',
+    mapZoomOut: 'Zoom out',
+    mapZoomReset: 'Reset zoom',
     matchesHosted: '{{count}} matches',
   },
   weather: {
@@ -332,6 +336,10 @@ export const vi: TranslationDict = {
     subtitle: '{{count}} sân vận động tại Bắc Mỹ',
     searchPlaceholder: 'Tìm sân vận động...',
     mapTitle: 'Bản đồ sân vận động',
+    mapHint: 'Cuộn để phóng to · Kéo để di chuyển · Dùng nút +/−',
+    mapZoomIn: 'Phóng to',
+    mapZoomOut: 'Thu nhỏ',
+    mapZoomReset: 'Đặt lại zoom',
     matchesHosted: '{{count}} trận',
   },
   weather: {
