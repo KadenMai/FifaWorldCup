@@ -194,13 +194,13 @@
   {
     "group": "E",
     "teamId": "germany",
-    "played": 2,
+    "played": 3,
     "won": 2,
     "drawn": 0,
-    "lost": 0,
-    "goalsFor": 9,
-    "goalsAgainst": 2,
-    "goalDifference": 7,
+    "lost": 1,
+    "goalsFor": 10,
+    "goalsAgainst": 4,
+    "goalDifference": 6,
     "points": 6
   },
   {
@@ -218,14 +218,14 @@
   {
     "group": "E",
     "teamId": "ecuador",
-    "played": 2,
-    "won": 0,
+    "played": 3,
+    "won": 1,
     "drawn": 1,
     "lost": 1,
-    "goalsFor": 0,
-    "goalsAgainst": 1,
-    "goalDifference": -1,
-    "points": 1
+    "goalsFor": 2,
+    "goalsAgainst": 2,
+    "goalDifference": 0,
+    "points": 4
   },
   {
     "group": "E",
