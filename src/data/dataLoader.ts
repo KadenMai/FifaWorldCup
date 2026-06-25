@@ -9,7 +9,7 @@ import type {
 } from '../types';
 
 /** Bump when JSON data changes to bust browser/CDN cache */
-const DATA_VERSION = '202606252201';
+const DATA_VERSION = '202606252202';
 
 let runtimeDataVersion = DATA_VERSION;
 
