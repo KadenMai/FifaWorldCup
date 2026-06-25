@@ -22,7 +22,7 @@ export class GitHubStore {
       headers: this.headers(),
     });
     if (!response.ok) {
-      throw new Error(`GitHub read failed (${response.status}): ${path}`);
+      throw new Error(await formatGitHubError('read', response, path));
     }
     const payload = (await response.json()) as { content: string; sha: string };
     const content = fromBase64Utf8(payload.content);
@@ -47,8 +47,7 @@ export class GitHubStore {
       }),
     });
     if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`GitHub write failed (${response.status}): ${body}`);
+      throw new Error(await formatGitHubError('write', response, path));
     }
   }
 
@@ -63,8 +62,30 @@ export class GitHubStore {
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
       'Content-Type': 'application/json',
+      'User-Agent': 'FifaWorldCup-Pages-Function',
     };
   }
+}
+
+async function formatGitHubError(
+  action: 'read' | 'write',
+  response: Response,
+  path: string
+): Promise<string> {
+  let detail = '';
+  try {
+    const payload = (await response.json()) as { message?: string; documentation_url?: string };
+    detail = payload.message ?? '';
+  } catch {
+    detail = await response.text();
+  }
+
+  const hint =
+    response.status === 403
+      ? ' Check token: Contents Read+Write on KadenMai/FifaWorldCup, branch main, no extra spaces in secrets.'
+      : '';
+
+  return `GitHub ${action} failed (${response.status}) for ${path}${detail ? `: ${detail}` : ''}${hint}`;
 }
 
 function toBase64Utf8(text: string): string {
