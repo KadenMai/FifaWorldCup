@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { Match, Stadium, Team } from '../types';
-import { useData } from '../context/DataContext';
 import { useLanguage } from '../context/LanguageContext';
-import MatchScoreModal from './MatchScoreModal';
 import TeamFlag from './TeamFlag';
 import {
   formatDate,
@@ -28,11 +26,8 @@ export default function GoogleMatchRow({
   showMeta = true,
   locale,
 }: GoogleMatchRowProps) {
-  const navigate = useNavigate();
-  const { applyScoreUpdate } = useData();
   const { locale: ctxLocale, t } = useLanguage();
   const loc = locale ?? ctxLocale;
-  const [scoreModalOpen, setScoreModalOpen] = useState(false);
 
   const home = getTeamById(teams, match.homeTeamId);
   const away = getTeamById(teams, match.awayTeamId);
@@ -54,20 +49,8 @@ export default function GoogleMatchRow({
     : `${match.homeScore ?? '-'} - ${match.awayScore ?? '-'}`;
 
   return (
-    <>
-      <div
-        className="g-match-row g-match-row-readable"
-        role="link"
-        tabIndex={0}
-        onClick={() => navigate(`/matches/${match.id}`)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            navigate(`/matches/${match.id}`);
-          }
-        }}
-      >
-        <div className="g-match-row-top">
+    <Link to={`/matches/${match.id}`} className="g-match-row g-match-row-readable">
+      <div className="g-match-row-top">
           <span className="g-match-round">
             {roundLabel}
             {match.group ? ` · ${t('common.group')} ${match.group}` : ''}
@@ -101,33 +84,12 @@ export default function GoogleMatchRow({
           </span>
         </div>
 
-        <button
-          type="button"
-          className="g-match-update-btn"
-          onClick={(event) => {
-            event.stopPropagation();
-            setScoreModalOpen(true);
-          }}
-        >
-          {t('admin.updateButton')}
-        </button>
-
         {showMeta && stadium && (
           <div className="g-match-meta">
             {stadium.name} · {stadium.city}
           </div>
         )}
-      </div>
-
-      <MatchScoreModal
-        match={match}
-        home={home}
-        away={away}
-        open={scoreModalOpen}
-        onClose={() => setScoreModalOpen(false)}
-        onSaved={applyScoreUpdate}
-      />
-    </>
+    </Link>
   );
 }
 

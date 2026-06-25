@@ -15,7 +15,7 @@
   },
   {
     "id": "match-002",
-    "date": "2026-06-12",
+    "date": "2026-06-11",
     "time": "20:00",
     "timezone": "America/Mexico_City",
     "homeTeamId": "south-korea",
@@ -43,7 +43,7 @@
   },
   {
     "id": "match-004",
-    "date": "2026-06-19",
+    "date": "2026-06-18",
     "time": "19:00",
     "timezone": "America/Mexico_City",
     "homeTeamId": "mexico",
@@ -57,8 +57,8 @@
   },
   {
     "id": "match-005",
-    "date": "2026-06-25",
-    "time": "01:00",
+    "date": "2026-06-24",
+    "time": "19:00",
     "timezone": "America/Mexico_City",
     "homeTeamId": "czechia",
     "awayTeamId": "mexico",
@@ -71,8 +71,8 @@
   },
   {
     "id": "match-006",
-    "date": "2026-06-25",
-    "time": "01:00",
+    "date": "2026-06-24",
+    "time": "19:00",
     "timezone": "America/Monterrey",
     "homeTeamId": "south-africa",
     "awayTeamId": "south-korea",
@@ -267,8 +267,8 @@
   },
   {
     "id": "match-020",
-    "date": "2026-06-14",
-    "time": "18:00",
+    "date": "2026-06-13",
+    "time": "21:00",
     "timezone": "America/Vancouver",
     "homeTeamId": "australia",
     "awayTeamId": "turkiye",
@@ -296,7 +296,7 @@
   {
     "id": "match-022",
     "date": "2026-06-19",
-    "time": "21:00",
+    "time": "20:00",
     "timezone": "America/Los_Angeles",
     "homeTeamId": "turkiye",
     "awayTeamId": "paraguay",
@@ -309,7 +309,7 @@
   },
   {
     "id": "match-023",
-    "date": "2026-06-26",
+    "date": "2026-06-25",
     "time": "19:00",
     "timezone": "America/Los_Angeles",
     "homeTeamId": "turkiye",
@@ -323,7 +323,7 @@
   },
   {
     "id": "match-024",
-    "date": "2026-06-26",
+    "date": "2026-06-25",
     "time": "19:00",
     "timezone": "America/Los_Angeles",
     "homeTeamId": "paraguay",
@@ -379,7 +379,7 @@
   },
   {
     "id": "match-028",
-    "date": "2026-06-21",
+    "date": "2026-06-20",
     "time": "19:00",
     "timezone": "America/Chicago",
     "homeTeamId": "ecuador",
@@ -463,7 +463,7 @@
   },
   {
     "id": "match-034",
-    "date": "2026-06-21",
+    "date": "2026-06-20",
     "time": "22:00",
     "timezone": "America/Monterrey",
     "homeTeamId": "tunisia",
@@ -477,7 +477,7 @@
   },
   {
     "id": "match-035",
-    "date": "2026-06-26",
+    "date": "2026-06-25",
     "time": "18:00",
     "timezone": "America/Chicago",
     "homeTeamId": "tunisia",
@@ -491,7 +491,7 @@
   },
   {
     "id": "match-036",
-    "date": "2026-06-26",
+    "date": "2026-06-25",
     "time": "18:00",
     "timezone": "America/Chicago",
     "homeTeamId": "japan",
@@ -515,7 +515,7 @@
     "status": "Finished",
     "round": "Group Stage",
     "group": "G",
-    "stadiumId": "bc-place"
+    "stadiumId": "lumen-field"
   },
   {
     "id": "match-038",
@@ -561,7 +561,7 @@
   },
   {
     "id": "match-041",
-    "date": "2026-06-27",
+    "date": "2026-06-26",
     "time": "20:00",
     "timezone": "America/Vancouver",
     "homeTeamId": "new-zealand",
@@ -575,7 +575,7 @@
   },
   {
     "id": "match-042",
-    "date": "2026-06-27",
+    "date": "2026-06-26",
     "time": "20:00",
     "timezone": "America/Los_Angeles",
     "homeTeamId": "egypt",
@@ -645,8 +645,8 @@
   },
   {
     "id": "match-047",
-    "date": "2026-06-27",
-    "time": "18:00",
+    "date": "2026-06-26",
+    "time": "19:00",
     "timezone": "America/Chicago",
     "homeTeamId": "cape-verde",
     "awayTeamId": "saudi-arabia",
@@ -659,8 +659,8 @@
   },
   {
     "id": "match-048",
-    "date": "2026-06-27",
-    "time": "19:00",
+    "date": "2026-06-26",
+    "time": "18:00",
     "timezone": "America/Mexico_City",
     "homeTeamId": "uruguay",
     "awayTeamId": "spain",
