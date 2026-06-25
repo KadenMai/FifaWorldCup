@@ -13,27 +13,27 @@
   },
   {
     "group": "A",
-    "teamId": "south-korea",
-    "played": 2,
+    "teamId": "south-africa",
+    "played": 3,
     "won": 1,
-    "drawn": 0,
+    "drawn": 1,
     "lost": 1,
     "goalsFor": 2,
-    "goalsAgainst": 2,
-    "goalDifference": 0,
-    "points": 3
+    "goalsAgainst": 3,
+    "goalDifference": -1,
+    "points": 4
   },
   {
     "group": "A",
-    "teamId": "south-africa",
-    "played": 2,
-    "won": 0,
-    "drawn": 1,
-    "lost": 1,
-    "goalsFor": 1,
+    "teamId": "south-korea",
+    "played": 3,
+    "won": 1,
+    "drawn": 0,
+    "lost": 2,
+    "goalsFor": 2,
     "goalsAgainst": 3,
-    "goalDifference": -2,
-    "points": 1
+    "goalDifference": -1,
+    "points": 3
   },
   {
     "group": "A",
