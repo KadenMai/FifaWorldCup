@@ -1,0 +1,13 @@
+[
+  { "stadiumId": "sofi-stadium", "city": "Inglewood", "temperatureF": 78, "condition": "Partly Cloudy", "wind": "8 mph SW", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "metlife-stadium", "city": "East Rutherford", "temperatureF": 82, "condition": "Sunny", "wind": "5 mph NE", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "att-stadium", "city": "Arlington", "temperatureF": 95, "condition": "Hot & Clear", "wind": "12 mph S", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "mercedes-benz-stadium", "city": "Atlanta", "temperatureF": 88, "condition": "Humid", "wind": "6 mph E", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "hard-rock-stadium", "city": "Miami Gardens", "temperatureF": 90, "condition": "Thunderstorms Possible", "wind": "10 mph SE", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "lumen-field", "city": "Seattle", "temperatureF": 68, "condition": "Overcast", "wind": "7 mph W", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "bmo-field", "city": "Toronto", "temperatureF": 75, "condition": "Clear", "wind": "4 mph N", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "bc-place", "city": "Vancouver", "temperatureF": 65, "condition": "Light Rain", "wind": "9 mph NW", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "azteca", "city": "Mexico City", "temperatureF": 72, "condition": "Partly Cloudy", "wind": "6 mph E", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "akron", "city": "Guadalajara", "temperatureF": 85, "condition": "Sunny", "wind": "5 mph W", "updatedAt": "2026-06-24T12:00:00Z" },
+  { "stadiumId": "bbva", "city": "Monterrey", "temperatureF": 98, "condition": "Very Hot", "wind": "8 mph N", "updatedAt": "2026-06-24T12:00:00Z" }
+]

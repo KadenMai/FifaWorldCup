@@ -1,0 +1,338 @@
+[
+  {
+    "id": "coach-mexico",
+    "teamId": "mexico",
+    "name": "Javier Aguirre",
+    "nationality": "Mexico",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-south-africa",
+    "teamId": "south-africa",
+    "name": "Hugo Broos",
+    "nationality": "South Africa",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-south-korea",
+    "teamId": "south-korea",
+    "name": "Hong Myung-bo",
+    "nationality": "Korea Republic",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-czechia",
+    "teamId": "czechia",
+    "name": "Ivan Hašek",
+    "nationality": "Czechia",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-canada",
+    "teamId": "canada",
+    "name": "Jesse Marsch",
+    "nationality": "Canada",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-bosnia",
+    "teamId": "bosnia",
+    "name": "Sergej Barbarez",
+    "nationality": "Bosnia and Herzegovina",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-qatar",
+    "teamId": "qatar",
+    "name": "Carlos Queiroz",
+    "nationality": "Qatar",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-switzerland",
+    "teamId": "switzerland",
+    "name": "Murat Yakin",
+    "nationality": "Switzerland",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-brazil",
+    "teamId": "brazil",
+    "name": "Dorival Júnior",
+    "nationality": "Brazil",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-morocco",
+    "teamId": "morocco",
+    "name": "Walid Regragui",
+    "nationality": "Morocco",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-haiti",
+    "teamId": "haiti",
+    "name": "Sébastien Migné",
+    "nationality": "Haiti",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-scotland",
+    "teamId": "scotland",
+    "name": "Steve Clarke",
+    "nationality": "Scotland",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-usa",
+    "teamId": "usa",
+    "name": "Mauricio Pochettino",
+    "nationality": "United States",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-paraguay",
+    "teamId": "paraguay",
+    "name": "Alfaro Gómez",
+    "nationality": "Paraguay",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-australia",
+    "teamId": "australia",
+    "name": "Graham Arnold",
+    "nationality": "Australia",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-turkiye",
+    "teamId": "turkiye",
+    "name": "Vincenzo Montella",
+    "nationality": "Türkiye",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-germany",
+    "teamId": "germany",
+    "name": "Julian Nagelsmann",
+    "nationality": "Germany",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-curacao",
+    "teamId": "curacao",
+    "name": "Dick Advocaat",
+    "nationality": "Curaçao",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-ivory-coast",
+    "teamId": "ivory-coast",
+    "name": "Emerse Faé",
+    "nationality": "Côte d'Ivoire",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-ecuador",
+    "teamId": "ecuador",
+    "name": "Sebastián Beccacece",
+    "nationality": "Ecuador",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-netherlands",
+    "teamId": "netherlands",
+    "name": "Ronald Koeman",
+    "nationality": "Netherlands",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-japan",
+    "teamId": "japan",
+    "name": "Hajime Moriyasu",
+    "nationality": "Japan",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-sweden",
+    "teamId": "sweden",
+    "name": "Jon Dahl Tomasson",
+    "nationality": "Sweden",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-tunisia",
+    "teamId": "tunisia",
+    "name": "Samuel Zaoui",
+    "nationality": "Tunisia",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-belgium",
+    "teamId": "belgium",
+    "name": "Rudi Völler",
+    "nationality": "Belgium",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-egypt",
+    "teamId": "egypt",
+    "name": "Hossam Hassan",
+    "nationality": "Egypt",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-iran",
+    "teamId": "iran",
+    "name": "Amir Ghalenoei",
+    "nationality": "IR Iran",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-new-zealand",
+    "teamId": "new-zealand",
+    "name": "Darije Kalezić",
+    "nationality": "New Zealand",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-spain",
+    "teamId": "spain",
+    "name": "Luis de la Fuente",
+    "nationality": "Spain",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-cape-verde",
+    "teamId": "cape-verde",
+    "name": "Bubista",
+    "nationality": "Cabo Verde",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-saudi-arabia",
+    "teamId": "saudi-arabia",
+    "name": "Manuel Mancini",
+    "nationality": "Saudi Arabia",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-uruguay",
+    "teamId": "uruguay",
+    "name": "Marcelo Bielsa",
+    "nationality": "Uruguay",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-france",
+    "teamId": "france",
+    "name": "Didier Deschamps",
+    "nationality": "France",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-senegal",
+    "teamId": "senegal",
+    "name": "Aliou Cissé",
+    "nationality": "Senegal",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-iraq",
+    "teamId": "iraq",
+    "name": "Jesús Casas",
+    "nationality": "Iraq",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-norway",
+    "teamId": "norway",
+    "name": "Ståle Solbakken",
+    "nationality": "Norway",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-argentina",
+    "teamId": "argentina",
+    "name": "Lionel Scaloni",
+    "nationality": "Argentina",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-algeria",
+    "teamId": "algeria",
+    "name": "Vahid Halilhodžić",
+    "nationality": "Algeria",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-austria",
+    "teamId": "austria",
+    "name": "Ralf Rangnick",
+    "nationality": "Austria",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-jordan",
+    "teamId": "jordan",
+    "name": "Husam Al-Malkawi",
+    "nationality": "Jordan",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-portugal",
+    "teamId": "portugal",
+    "name": "Roberto Martínez",
+    "nationality": "Portugal",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-dr-congo",
+    "teamId": "dr-congo",
+    "name": "Sébastien Desabre",
+    "nationality": "Congo DR",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-uzbekistan",
+    "teamId": "uzbekistan",
+    "name": "Slavisa Jokanovic",
+    "nationality": "Uzbekistan",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-colombia",
+    "teamId": "colombia",
+    "name": "Néstor Lorenzo",
+    "nationality": "Colombia",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-england",
+    "teamId": "england",
+    "name": "Thomas Tuchel",
+    "nationality": "England",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-croatia",
+    "teamId": "croatia",
+    "name": "Zlatko Dalić",
+    "nationality": "Croatia",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-ghana",
+    "teamId": "ghana",
+    "name": "Otto Addo",
+    "nationality": "Ghana",
+    "notes": "FIFA World Cup 2026"
+  },
+  {
+    "id": "coach-panama",
+    "teamId": "panama",
+    "name": "Thomas Christiansen",
+    "nationality": "Panama",
+    "notes": "FIFA World Cup 2026"
+  }
+]

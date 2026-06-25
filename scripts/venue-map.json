@@ -1,0 +1,82 @@
+{
+  "azteca": {
+    "stadiumId": "azteca",
+    "timezone": "America/Mexico_City",
+    "aliases": ["azteca", "mexico city", "estadio azteca"]
+  },
+  "akron": {
+    "stadiumId": "akron",
+    "timezone": "America/Mexico_City",
+    "aliases": ["akron", "guadalajara", "estadio akron"]
+  },
+  "bbva": {
+    "stadiumId": "bbva",
+    "timezone": "America/Monterrey",
+    "aliases": ["bbva", "monterrey", "estadio bbva"]
+  },
+  "bmo-field": {
+    "stadiumId": "bmo-field",
+    "timezone": "America/Toronto",
+    "aliases": ["bmo", "toronto", "bmo field"]
+  },
+  "bc-place": {
+    "stadiumId": "bc-place",
+    "timezone": "America/Vancouver",
+    "aliases": ["bc place", "vancouver"]
+  },
+  "sofi-stadium": {
+    "stadiumId": "sofi-stadium",
+    "timezone": "America/Los_Angeles",
+    "aliases": ["sofi", "inglewood", "los angeles"]
+  },
+  "levis-stadium": {
+    "stadiumId": "levis-stadium",
+    "timezone": "America/Los_Angeles",
+    "aliases": ["levi", "santa clara", "san francisco", "bay area"]
+  },
+  "metlife-stadium": {
+    "stadiumId": "metlife-stadium",
+    "timezone": "America/New_York",
+    "aliases": ["metlife", "east rutherford", "new york", "new jersey"]
+  },
+  "gillette-stadium": {
+    "stadiumId": "gillette-stadium",
+    "timezone": "America/New_York",
+    "aliases": ["gillette", "foxborough", "boston"]
+  },
+  "mercedes-benz-stadium": {
+    "stadiumId": "mercedes-benz-stadium",
+    "timezone": "America/New_York",
+    "aliases": ["mercedes", "mercedes-benz", "atlanta"]
+  },
+  "hard-rock-stadium": {
+    "stadiumId": "hard-rock-stadium",
+    "timezone": "America/New_York",
+    "aliases": ["hard rock", "miami gardens", "miami"]
+  },
+  "lumen-field": {
+    "stadiumId": "lumen-field",
+    "timezone": "America/Los_Angeles",
+    "aliases": ["lumen", "seattle"]
+  },
+  "nrg-stadium": {
+    "stadiumId": "nrg-stadium",
+    "timezone": "America/Chicago",
+    "aliases": ["nrg", "houston"]
+  },
+  "att-stadium": {
+    "stadiumId": "att-stadium",
+    "timezone": "America/Chicago",
+    "aliases": ["at&t", "att", "arlington", "dallas"]
+  },
+  "lincoln-financial": {
+    "stadiumId": "lincoln-financial",
+    "timezone": "America/New_York",
+    "aliases": ["lincoln financial", "philadelphia"]
+  },
+  "arrowhead-stadium": {
+    "stadiumId": "arrowhead-stadium",
+    "timezone": "America/Chicago",
+    "aliases": ["arrowhead", "geha", "kansas city"]
+  }
+}

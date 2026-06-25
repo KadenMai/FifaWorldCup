@@ -1,0 +1,49 @@
+name: Sync API-Football data
+
+on:
+  schedule:
+    # Every 30 minutes (UTC). Free tier: 2 API calls/run ≈ 96 calls/day max.
+    - cron: "0 */30 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-api-football
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements-sync.txt
+
+      - name: Verify team map is committed
+        run: python -c "import json; m=json.load(open('scripts/team-map.json')); assert m, 'scripts/team-map.json is empty — run build_team_map.py locally and commit'"
+
+      - name: Sync matches and standings
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+        run: python scripts/sync_api_football.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/matches.json public/data/standings.json src/data/dataLoader.ts
+          if git diff --staged --quiet; then
+            echo "No data changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(data): sync from API-Football"
+          git push
