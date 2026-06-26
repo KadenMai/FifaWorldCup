@@ -496,9 +496,9 @@
     "timezone": "America/Chicago",
     "homeTeamId": "japan",
     "awayTeamId": "sweden",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "F",
     "stadiumId": "att-stadium"
