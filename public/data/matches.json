@@ -328,9 +328,9 @@
     "timezone": "America/Los_Angeles",
     "homeTeamId": "paraguay",
     "awayTeamId": "australia",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "D",
     "stadiumId": "levis-stadium"
