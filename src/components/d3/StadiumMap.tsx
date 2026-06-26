@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import type { Stadium } from '../../types';
 import { useEdition } from '../../context/EditionContext';
 import { useT } from '../../context/LanguageContext';
-import { getRuntimeDataVersion } from '../../data/dataLoader';
+import { getDataBaseUrl, getRuntimeDataVersion } from '../../data/dataLoader';
 
 interface StadiumMapProps {
   stadiums: Stadium[];
@@ -38,7 +38,7 @@ const GEO_COUNTRY_KEY: Record<string, keyof typeof COUNTRY_COLORS> = {
 const geoCache: Record<string, { countries?: HostGeoJson; admin1?: Admin1GeoJson }> = {};
 
 async function loadGeoJson<T>(edition: string, fileName: string): Promise<T> {
-  const url = `${import.meta.env.BASE_URL}data/${edition}/${fileName}?v=${getRuntimeDataVersion()}`;
+  const url = `${getDataBaseUrl()}${edition}/${fileName}?v=${getRuntimeDataVersion()}`;
   const response = await fetch(url, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Failed to load ${fileName}`);
   return response.json() as Promise<T>;

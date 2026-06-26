@@ -1,12 +1,5 @@
-import { GitHubStore } from '../lib/githubStore';
-
-interface Env {
-  GITHUB_TOKEN?: string;
-  GITHUB_REPO?: string;
-  GITHUB_BRANCH?: string;
-  ADMIN_API_KEY?: string;
-  DEFAULT_EDITION?: string;
-}
+import { editionDataPaths } from '../lib/dataPaths';
+import { R2Store } from '../lib/r2Store';
 
 function resolveEdition(env: Env): string {
   const raw = env.DEFAULT_EDITION?.trim() ?? '';
@@ -14,65 +7,55 @@ function resolveEdition(env: Env): string {
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
-  const token = env.GITHUB_TOKEN?.trim() ?? '';
-  const repo = env.GITHUB_REPO?.trim() ?? '';
-  const branch = env.GITHUB_BRANCH?.trim() || 'main';
   const adminKey = env.ADMIN_API_KEY?.trim() ?? '';
   const edition = resolveEdition(env);
-  const matchesPath = `public/data/${edition}/matches.json`;
+  const paths = editionDataPaths(edition);
 
   const providedAdmin = request.headers.get('X-Admin-Key')?.trim() ?? '';
   const isAdmin = Boolean(adminKey) && providedAdmin === adminKey;
 
-  const hasGithubToken = Boolean(token);
-  const hasGithubRepo = Boolean(repo);
-  const hasGithubBranch = Boolean(env.GITHUB_BRANCH?.trim());
+  const hasR2Binding = Boolean(env.DATA_BUCKET);
   const hasAdminApiKey = Boolean(adminKey);
-  const githubConfigured = hasGithubToken && hasGithubRepo;
 
-  let githubTokenWorks = false;
-  let githubError: string | undefined;
-  let matchesFileSha: string | undefined;
+  let r2Works = false;
+  let r2Error: string | undefined;
+  let matchesObjectSize: number | undefined;
 
-  if (githubConfigured) {
+  if (hasR2Binding) {
     try {
-      const store = new GitHubStore(token, repo, branch);
-      const file = await store.readText(matchesPath);
-      githubTokenWorks = true;
-      matchesFileSha = file.sha;
+      const store = new R2Store(env.DATA_BUCKET);
+      const text = await store.readText(paths.matches);
+      if (text == null) {
+        r2Error = `Object not found: ${paths.matches} — run npm run seed:r2 to upload initial data`;
+      } else {
+        r2Works = true;
+        matchesObjectSize = text.length;
+      }
     } catch (error) {
-      githubError = error instanceof Error ? error.message : 'GitHub token test failed';
+      r2Error = error instanceof Error ? error.message : 'R2 read failed';
     }
-  } else if (!hasGithubToken) {
-    githubError = 'Missing GITHUB_TOKEN';
-  } else if (!hasGithubRepo) {
-    githubError = 'Missing GITHUB_REPO';
+  } else {
+    r2Error = 'Missing DATA_BUCKET R2 binding';
   }
 
-  const scoreApiReady = githubConfigured && githubTokenWorks && hasAdminApiKey;
+  const scoreApiReady = hasR2Binding && r2Works && hasAdminApiKey;
 
   const payload: Record<string, unknown> = {
     ok: true,
     service: 'fifaworldcup-score-api',
+    storage: 'r2',
     scoreApiReady,
-    githubConfigured,
-    githubTokenWorks,
-    githubError,
-    hasGithubToken,
-    hasGithubRepo,
-    hasGithubBranch,
+    hasR2Binding,
+    r2Works,
+    r2Error,
     hasAdminApiKey,
-    githubRepo: repo || undefined,
-    githubBranch: branch,
     edition,
-    matchesFileSha,
-    githubTokenLength: token ? token.length : 0,
+    matchesKey: paths.matches,
+    matchesObjectSize,
   };
 
-  if (isAdmin && token) {
-    payload.githubTokenPreview = token.slice(0, 100);
-  } else if (token) {
-    payload.githubTokenPreviewHint = 'Send header X-Admin-Key to see githubTokenPreview (first 100 chars)';
+  if (isAdmin) {
+    payload.adminHint = 'Score updates write to R2; reads served via GET /api/data/*';
   }
 
   return new Response(JSON.stringify(payload), {

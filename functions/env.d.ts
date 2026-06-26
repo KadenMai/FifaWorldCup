@@ -1,9 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 interface Env {
-  GITHUB_TOKEN: string;
-  GITHUB_REPO: string;
-  GITHUB_BRANCH?: string;
+  DATA_BUCKET: R2Bucket;
   ADMIN_API_KEY: string;
   DEFAULT_EDITION?: string;
 }

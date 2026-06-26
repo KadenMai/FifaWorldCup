@@ -75,24 +75,69 @@ Or create an empty project named `fifaworldcup` in the Cloudflare dashboard.
 
 Site URL: `https://fifaworldcup.pages.dev` (or your custom domain in Cloudflare).
 
-#### In-page score updates (Cloudflare Pages Function)
+#### In-page score updates (Cloudflare R2 + Pages Functions)
 
-The site includes a **Pages Function** at `/api/update-match` (folder `functions/`). On each match row, tap the **score / vs** between the flags to open a popup and save.
+Live tournament data is stored in **Cloudflare R2**, not GitHub. Score updates are instant for all visitors — no git commit or redeploy needed.
 
-**Cloudflare dashboard → Pages → your project → Settings → Environment variables** (Production):
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/update-match` | Admin score save → writes `matches.json`, `standings.json`, `meta.json` to R2 |
+| `GET /api/data/*` | Serves JSON from R2 (e.g. `/api/data/2026/matches.json`) |
+| `GET /api/health` | Checks R2 binding + admin key |
+
+On each match row, tap the **score / vs** between the flags to open a popup and save.
+
+**One-time R2 setup:**
+
+1. Create bucket (or use existing name in `wrangler.toml`):
+
+```powershell
+npx wrangler r2 bucket create fifaworldcup-data
+```
+
+2. **R2 binding** — already in `wrangler.toml` (Cloudflare dashboard will show *“Bindings for this project are being managed through wrangler.toml”* — that is correct; do **not** add a duplicate binding in the UI):
+
+```toml
+[[r2_buckets]]
+binding = "DATA_BUCKET"
+bucket_name = "fifaworldcup-data"
+```
+
+Redeploy after pushing so Pages picks up the binding.
+
+3. Upload seed data from `public/data/`:
+
+```powershell
+npm run seed:r2
+```
+
+4. **Environment variables** (Production):
 
 | Name | Value |
 |------|--------|
-| `GITHUB_TOKEN` | GitHub PAT with **Contents: write** on this repo |
-| `GITHUB_REPO` | `KadenMai/FifaWorldCup` |
-| `GITHUB_BRANCH` | `main` |
-| `ADMIN_API_KEY` | long random secret — enter the same value in the popup |
+| `ADMIN_API_KEY` | long random secret — enter the same value in the score popup |
+| `DEFAULT_EDITION` | `2026` (optional) |
 
-After saving env vars, **redeploy** the Pages project (new deployment required for functions to pick up secrets).
+5. Build env var (set in deploy workflow or Pages **Build** settings):
 
-Test health: `GET https://your-site.pages.dev/api/health`
+| Name | Value |
+|------|--------|
+| `VITE_DATA_URL` | `/api/data/` |
 
-**Note:** Score editing works on the deployed Cloudflare site, not `npm run dev` (unless you run `npx wrangler pages dev`).
+The deploy workflow already sets `VITE_DATA_URL=/api/data/` so the client reads from R2 via the API.
+
+Test health: `GET https://your-site.pages.dev/api/health` — expect `"r2Works": true`.
+
+**Local dev with R2:**
+
+```powershell
+npm run pages:dev
+# Uses static /data/ unless you set VITE_DATA_URL=/api/data/ in .env.local and re-build
+```
+
+**Note:** Plain `npm run dev` still serves JSON from `public/data/` (no R2). Use `npm run pages:dev` to test score updates locally.
+
+GitHub is still used for **source code** and optional script-based updates (`manual_update_match.py` → commit → redeploy refreshes static fallback in `dist/`).
 
 ### 3. AWS Lambda (optional — skip if using Cloudflare Function above)
 
@@ -344,13 +389,15 @@ Invoke-RestMethod `
 
 ## What gets updated automatically
 
-When you update one match, the tool updates:
+When you update one match via `/api/update-match` or local script:
 
 | File | Change |
 |------|--------|
-| `public/data/2026/matches.json` | Score + status for that match |
-| `public/data/2026/standings.json` | Recalculated from all **Finished** group matches |
-| `public/data/2026/meta.json` | `dataVersion` timestamp (cache bust) |
+| `matches.json` | Score + status for that match |
+| `standings.json` | Recalculated from all **Finished** group matches |
+| `meta.json` | `dataVersion` timestamp (cache bust) |
+
+**Cloudflare:** files live in R2 at `data/{edition}/…`. **Local script:** writes to `public/data/{edition}/…` (commit + redeploy to refresh static copy).
 
 Knockout bracket is derived from group results + fixture rules in code.
 
@@ -360,11 +407,12 @@ Knockout bracket is derived from group results + fixture rules in code.
 
 | Part | Service | Cost |
 |------|---------|------|
-| Website | Cloudflare Pages or GitHub Pages | Free |
-| Score API | AWS Lambda (auto-deploy) | Free tier |
-| Data storage | JSON in GitHub repo | Free |
-| Manual update (local) | Python script | Free |
-| Manual update (remote) | Azure Functions or AWS Lambda | Free tier |
+| Website | Cloudflare Pages | Free |
+| Live data | Cloudflare R2 | Free tier |
+| Score API | Cloudflare Pages Functions | Free |
+| Seed / dev data | JSON in git (`public/data/`) | Free |
+| Manual update (local) | Python script → git | Free |
+| Manual update (remote alt) | AWS Lambda / Azure (GitHub-backed) | Free tier |
 | Auto API sync | API-Football Pro | **Not required** — see below |
 
 ---
@@ -383,6 +431,7 @@ See `scripts/2026/sync_api_football.py` and workflow `sync-api-football.yml` (di
 | Script | Purpose |
 |--------|---------|
 | `scripts/manual_update_match.py` | Update one match locally (any edition via `--edition`) |
+| `scripts/seed-r2.mjs` | Upload `public/data/**` to Cloudflare R2 |
 | `scripts/2026/generate-data.mjs` | Regenerate 2026 seed data |
 | `scripts/2026/generate-knockout-matches.mjs` | Append 2026 knockout fixtures |
 | `scripts/2026/sync-espn-kickoffs.mjs` | Sync 2026 group-stage kickoffs from ESPN |
@@ -407,7 +456,9 @@ node scripts/2026/generate-data.mjs
 
 | Problem | Fix |
 |---------|-----|
-| Site shows old scores | Hard refresh `Ctrl+Shift+R`; check `dataVersion` in `public/data/2026/meta.json` changed |
+| Site shows old scores | Hard refresh; check `/api/health` → `r2Works`; verify `meta.json` `dataVersion` via `/api/data/2026/meta.json` |
+| Score save fails | `GET /api/health` — need `DATA_BUCKET` binding + `npm run seed:r2` |
+| R2 empty after deploy | Run `npm run seed:r2` once; redeploy does not copy git JSON to R2 |
 | `Match not found` | Use id from `matches.json` (e.g. `match-001`) |
 | Azure / Lambda `Unauthorized` | Send header `X-Admin-Key` matching `ADMIN_API_KEY` |
 | GitHub push from API fails | PAT needs **Contents: write** on the repo |

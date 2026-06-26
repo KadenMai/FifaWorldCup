@@ -29,6 +29,15 @@ export interface EditionCatalog {
 
 let runtimeDataVersion = '1';
 
+/** Base URL for edition JSON. Set VITE_DATA_URL=/api/data/ in production (R2-backed reads). */
+export function getDataBaseUrl(): string {
+  const override = import.meta.env.VITE_DATA_URL?.trim();
+  if (override) {
+    return override.endsWith('/') ? override : `${override}/`;
+  }
+  return `${import.meta.env.BASE_URL}data/`;
+}
+
 export function setRuntimeDataVersion(version: string): void {
   runtimeDataVersion = version;
 }
@@ -38,17 +47,17 @@ export function getRuntimeDataVersion(): string {
 }
 
 export async function loadEditionCatalog(): Promise<EditionCatalog> {
-  const url = `${import.meta.env.BASE_URL}data/index.json`;
+  const url = `${getDataBaseUrl()}index.json`;
   return fetchJson<EditionCatalog>(url, { cache: 'no-store' });
 }
 
 export async function loadEditionMeta(edition: string): Promise<EditionMeta> {
-  const url = `${import.meta.env.BASE_URL}data/${edition}/meta.json`;
+  const url = `${getDataBaseUrl()}${edition}/meta.json`;
   return fetchJson<EditionMeta>(url, { cache: 'no-store' });
 }
 
 export async function loadJson<T>(edition: string, fileName: string): Promise<T> {
-  const url = `${import.meta.env.BASE_URL}data/${edition}/${fileName}?v=${runtimeDataVersion}`;
+  const url = `${getDataBaseUrl()}${edition}/${fileName}?v=${runtimeDataVersion}`;
   return fetchJson<T>(url, { cache: 'no-store' });
 }
 
