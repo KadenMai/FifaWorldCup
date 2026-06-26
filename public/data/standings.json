@@ -158,26 +158,26 @@
   {
     "group": "D",
     "teamId": "australia",
-    "played": 2,
+    "played": 3,
     "won": 1,
-    "drawn": 0,
+    "drawn": 1,
     "lost": 1,
     "goalsFor": 2,
     "goalsAgainst": 2,
     "goalDifference": 0,
-    "points": 3
+    "points": 4
   },
   {
     "group": "D",
     "teamId": "paraguay",
-    "played": 2,
+    "played": 3,
     "won": 1,
-    "drawn": 0,
+    "drawn": 1,
     "lost": 1,
     "goalsFor": 2,
     "goalsAgainst": 4,
     "goalDifference": -2,
-    "points": 3
+    "points": 4
   },
   {
     "group": "D",
