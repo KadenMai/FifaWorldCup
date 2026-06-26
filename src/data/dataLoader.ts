@@ -29,13 +29,16 @@ export interface EditionCatalog {
 
 let runtimeDataVersion = '1';
 
-/** Base URL for edition JSON. Set VITE_DATA_URL=/api/data/ in production (R2-backed reads). */
+/** Base URL for edition JSON. Production reads R2 via /api/data/; dev uses public/data/. */
 export function getDataBaseUrl(): string {
   const override = import.meta.env.VITE_DATA_URL?.trim();
   if (override) {
     return override.endsWith('/') ? override : `${override}/`;
   }
-  return `${import.meta.env.BASE_URL}data/`;
+  if (import.meta.env.DEV) {
+    return `${import.meta.env.BASE_URL}data/`;
+  }
+  return '/api/data/';
 }
 
 export function setRuntimeDataVersion(version: string): void {

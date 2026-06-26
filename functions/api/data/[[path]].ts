@@ -9,12 +9,20 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
+const API_PREFIX = '/api/data/';
+
+function subpathFromRequest(request: Request): string {
+  const url = new URL(request.url);
+  if (!url.pathname.startsWith(API_PREFIX)) return '';
+  return decodeURIComponent(url.pathname.slice(API_PREFIX.length));
+}
+
 export const onRequestOptions: PagesFunction<Env> = async () =>
   new Response(null, { status: 204, headers: CORS_HEADERS });
 
-export const onRequestGet: PagesFunction<Env> = async ({ env, params, request }) => {
-  const pathParam = typeof params.path === 'string' ? params.path : '';
-  const key = dataPathToObjectKey(pathParam);
+export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
+  const subpath = subpathFromRequest(request);
+  const key = dataPathToObjectKey(subpath);
   if (!key) {
     return new Response(JSON.stringify({ error: 'Invalid path' }), {
       status: 400,
