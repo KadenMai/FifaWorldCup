@@ -26,15 +26,15 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r scripts/requirements-sync.txt
+        run: pip install -r scripts/2026/requirements-sync.txt
 
       - name: Verify team map is committed
-        run: python -c "import json; m=json.load(open('scripts/team-map.json')); assert m, 'scripts/team-map.json is empty — run build_team_map.py locally and commit'"
+        run: python -c "import json; m=json.load(open('scripts/2026/team-map.json')); assert m, 'scripts/2026/team-map.json is empty — run build_team_map.py locally and commit'"
 
       - name: Sync matches and standings
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
-        run: python scripts/sync_api_football.py
+        run: python scripts/2026/sync_api_football.py
 
       - name: Commit and push if changed
         run: |

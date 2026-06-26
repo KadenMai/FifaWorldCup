@@ -147,7 +147,7 @@ You update scores yourself. The script recalculates **standings** and bumps **ca
 # Example: Mexico 2-0 South Africa, match finished
 python scripts/manual_update_match.py match-001 2 0 Finished
 
-git add public/data src/data/dataLoader.ts
+git add public/data/2026
 git commit -m "Update match-001 score"
 git push
 ```
@@ -348,9 +348,9 @@ When you update one match, the tool updates:
 
 | File | Change |
 |------|--------|
-| `public/data/matches.json` | Score + status for that match |
-| `public/data/standings.json` | Recalculated from all **Finished** group matches |
-| `src/data/dataLoader.ts` | `DATA_VERSION` timestamp (cache bust) |
+| `public/data/2026/matches.json` | Score + status for that match |
+| `public/data/2026/standings.json` | Recalculated from all **Finished** group matches |
+| `public/data/2026/meta.json` | `dataVersion` timestamp (cache bust) |
 
 Knockout bracket is derived from group results + fixture rules in code.
 
@@ -374,7 +374,7 @@ Knockout bracket is derived from group results + fixture rules in code.
 Only if you want automatic live scores from a third-party API.  
 **Free API-Football plan does NOT include World Cup 2026.**
 
-See `scripts/sync_api_football.py` and workflow `sync-api-football.yml` (disabled unless you add `APIFOOTBALL_KEY` secret).
+See `scripts/2026/sync_api_football.py` and workflow `sync-api-football.yml` (disabled unless you add `APIFOOTBALL_KEY` secret).
 
 ---
 
@@ -382,8 +382,12 @@ See `scripts/sync_api_football.py` and workflow `sync-api-football.yml` (disable
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/manual_update_match.py` | Update one match locally |
-| `scripts/generate-fifa2026-data.mjs` | Regenerate all seed data |
+| `scripts/manual_update_match.py` | Update one match locally (any edition via `--edition`) |
+| `scripts/2026/generate-data.mjs` | Regenerate 2026 seed data |
+| `scripts/2026/generate-knockout-matches.mjs` | Append 2026 knockout fixtures |
+| `scripts/2026/sync-espn-kickoffs.mjs` | Sync 2026 group-stage kickoffs from ESPN |
+| `scripts/2026/sync_api_football.py` | Optional API-Football sync for 2026 |
+| `scripts/2026/build_team_map.py` | Build API-Football team ID map for 2026 |
 | `azure-functions/` | HTTP API for remote score updates (Azure) |
 | `aws-lambda/` | Score API + SAM template (`template.yaml`) |
 | `.github/workflows/deploy-cloudflare-pages.yml` | Auto-deploy site to Cloudflare |
@@ -391,10 +395,10 @@ See `scripts/sync_api_football.py` and workflow `sync-api-football.yml` (disable
 
 ---
 
-## Regenerate seed data
+## Regenerate 2026 seed data
 
 ```bash
-node scripts/generate-fifa2026-data.mjs
+node scripts/2026/generate-data.mjs
 ```
 
 ---
@@ -403,7 +407,7 @@ node scripts/generate-fifa2026-data.mjs
 
 | Problem | Fix |
 |---------|-----|
-| Site shows old scores | Hard refresh `Ctrl+Shift+R`; check `DATA_VERSION` changed |
+| Site shows old scores | Hard refresh `Ctrl+Shift+R`; check `dataVersion` in `public/data/2026/meta.json` changed |
 | `Match not found` | Use id from `matches.json` (e.g. `match-001`) |
 | Azure / Lambda `Unauthorized` | Send header `X-Admin-Key` matching `ADMIN_API_KEY` |
 | GitHub push from API fails | PAT needs **Contents: write** on the repo |

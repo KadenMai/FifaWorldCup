@@ -4,8 +4,8 @@ Sync World Cup data from API-Football into public/data JSON files.
 
 Usage:
   set APIFOOTBALL_KEY=your_key
-  python scripts/build_team_map.py      # first time only
-  python scripts/sync_api_football.py
+  python scripts/2026/build_team_map.py      # first time only
+  python scripts/2026/sync_api_football.py
 
 Environment:
   APIFOOTBALL_KEY   Required. API-Sports / API-Football key.
@@ -26,15 +26,16 @@ from zoneinfo import ZoneInfo
 
 import requests
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
+SCRIPT_DIR = Path(__file__).resolve().parent
 EDITION = os.environ.get("EDITION", "2026").strip()
 DATA_DIR = ROOT / "public" / "data" / EDITION
 TEAMS_PATH = DATA_DIR / "teams.json"
 MATCHES_PATH = DATA_DIR / "matches.json"
 STANDINGS_PATH = DATA_DIR / "standings.json"
 META_PATH = DATA_DIR / "meta.json"
-TEAM_MAP_PATH = ROOT / "scripts" / "team-map.json"
-VENUE_MAP_PATH = ROOT / "scripts" / "venue-map.json"
+TEAM_MAP_PATH = SCRIPT_DIR / "team-map.json"
+VENUE_MAP_PATH = SCRIPT_DIR / "venue-map.json"
 
 API_BASE = "https://v3.football.api-sports.io"
 LEAGUE_ID = 1
@@ -105,7 +106,7 @@ def api_get(path: str, api_key: str, params: dict[str, Any] | None = None) -> di
                 f"API-Football plan error: {errors}\n"
                 "Free plan cannot access World Cup 2026 (season 2026). "
                 "Upgrade to Pro ($19/mo) at https://www.api-football.com/pricing "
-                "or keep using static data: node scripts/generate-fifa2026-data.mjs"
+                "or keep using static data: node scripts/2026/generate-data.mjs"
             )
         raise RuntimeError(f"API-Football error on {path}: {errors}")
 
@@ -308,7 +309,7 @@ def main() -> int:
 
     team_map = {str(k): v for k, v in load_json(TEAM_MAP_PATH).items()}
     if not team_map:
-        print("ERROR: scripts/team-map.json is empty. Run: python scripts/build_team_map.py", file=sys.stderr)
+        print("ERROR: scripts/2026/team-map.json is empty. Run: python scripts/2026/build_team_map.py", file=sys.stderr)
         return 1
 
     venue_map = load_json(VENUE_MAP_PATH)

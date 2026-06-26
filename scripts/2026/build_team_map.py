@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Build scripts/team-map.json by matching API-Football team IDs to local team slugs.
+Build scripts/2026/team-map.json by matching API-Football team IDs to local team slugs.
 
 Free plan cannot use league=1&season=2026. This script falls back to per-team
 search (works on free tier, ~1 API call per team).
 
 Usage:
   set APIFOOTBALL_KEY=your_key
-  python scripts/build_team_map.py
+  python scripts/2026/build_team_map.py
 """
 
 from __future__ import annotations
@@ -22,9 +22,10 @@ from pathlib import Path
 
 import requests
 
-ROOT = Path(__file__).resolve().parents[1]
-TEAMS_PATH = ROOT / "public" / "data" / "teams.json"
-TEAM_MAP_PATH = ROOT / "scripts" / "team-map.json"
+ROOT = Path(__file__).resolve().parents[2]
+SCRIPT_DIR = Path(__file__).resolve().parent
+TEAMS_PATH = ROOT / "public" / "data" / "2026" / "teams.json"
+TEAM_MAP_PATH = SCRIPT_DIR / "team-map.json"
 
 API_BASE = "https://v3.football.api-sports.io"
 LEAGUE_ID = 1
@@ -280,7 +281,7 @@ def main() -> int:
     print(
         "\nNOTE: Free plan cannot sync 2026 fixtures/standings (season 2026 blocked). "
         "team-map.json is ready for when you upgrade to Pro, or use static data: "
-        "node scripts/generate-fifa2026-data.mjs"
+        "node scripts/2026/generate-data.mjs"
     )
     return 0
 
