@@ -482,9 +482,9 @@
     "timezone": "America/Chicago",
     "homeTeamId": "tunisia",
     "awayTeamId": "netherlands",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "F",
     "stadiumId": "arrowhead-stadium"
