@@ -748,9 +748,9 @@
     "timezone": "America/Toronto",
     "homeTeamId": "senegal",
     "awayTeamId": "iraq",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 5,
+    "awayScore": 0,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "I",
     "stadiumId": "bmo-field"
