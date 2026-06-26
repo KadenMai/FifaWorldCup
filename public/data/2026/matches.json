@@ -734,9 +734,9 @@
     "timezone": "America/New_York",
     "homeTeamId": "norway",
     "awayTeamId": "france",
-    "homeScore": 1,
-    "awayScore": 1,
-    "status": "Live",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "Scheduled",
     "round": "Group Stage",
     "group": "I",
     "stadiumId": "gillette-stadium"
