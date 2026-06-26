@@ -146,14 +146,14 @@
   {
     "group": "D",
     "teamId": "usa",
-    "played": 2,
+    "played": 3,
     "won": 2,
-    "drawn": 0,
+    "drawn": 1,
     "lost": 0,
-    "goalsFor": 6,
-    "goalsAgainst": 1,
+    "goalsFor": 8,
+    "goalsAgainst": 3,
     "goalDifference": 5,
-    "points": 6
+    "points": 7
   },
   {
     "group": "D",
@@ -182,14 +182,14 @@
   {
     "group": "D",
     "teamId": "turkiye",
-    "played": 2,
+    "played": 3,
     "won": 0,
-    "drawn": 0,
+    "drawn": 1,
     "lost": 2,
-    "goalsFor": 0,
-    "goalsAgainst": 3,
+    "goalsFor": 2,
+    "goalsAgainst": 5,
     "goalDifference": -3,
-    "points": 0
+    "points": 1
   },
   {
     "group": "E",
