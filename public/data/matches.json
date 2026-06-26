@@ -314,9 +314,9 @@
     "timezone": "America/Los_Angeles",
     "homeTeamId": "turkiye",
     "awayTeamId": "usa",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "Scheduled",
+    "homeScore": 2,
+    "awayScore": 2,
+    "status": "Finished",
     "round": "Group Stage",
     "group": "D",
     "stadiumId": "sofi-stadium"
