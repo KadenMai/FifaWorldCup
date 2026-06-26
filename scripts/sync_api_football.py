@@ -10,7 +10,7 @@ Usage:
 Environment:
   APIFOOTBALL_KEY   Required. API-Sports / API-Football key.
   DRY_RUN=1         Print summary without writing files.
-  SKIP_VERSION_BUMP=1  Do not update DATA_VERSION in dataLoader.ts
+  SKIP_VERSION_BUMP=1  Do not update dataVersion in public/data/{edition}/meta.json
 """
 
 from __future__ import annotations
@@ -27,13 +27,14 @@ from zoneinfo import ZoneInfo
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "public" / "data"
+EDITION = os.environ.get("EDITION", "2026").strip()
+DATA_DIR = ROOT / "public" / "data" / EDITION
 TEAMS_PATH = DATA_DIR / "teams.json"
 MATCHES_PATH = DATA_DIR / "matches.json"
 STANDINGS_PATH = DATA_DIR / "standings.json"
+META_PATH = DATA_DIR / "meta.json"
 TEAM_MAP_PATH = ROOT / "scripts" / "team-map.json"
 VENUE_MAP_PATH = ROOT / "scripts" / "venue-map.json"
-DATA_LOADER_PATH = ROOT / "src" / "data" / "dataLoader.ts"
 
 API_BASE = "https://v3.football.api-sports.io"
 LEAGUE_ID = 1
@@ -284,20 +285,15 @@ def transform_standings(payload: dict[str, Any], team_map: dict[str, str]) -> li
     return rows
 
 
-def bump_data_version() -> bool:
-    text = DATA_LOADER_PATH.read_text(encoding="utf-8")
-    version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
-    updated, count = re.subn(
-        r"const DATA_VERSION = '[^']+';",
-        f"const DATA_VERSION = '{version}';",
-        text,
-        count=1,
-    )
-    if count != 1:
-        print("WARNING: Could not update DATA_VERSION in dataLoader.ts")
+def bump_edition_meta() -> bool:
+    if not META_PATH.exists():
+        print(f"WARNING: {META_PATH} not found")
         return False
-    DATA_LOADER_PATH.write_text(updated, encoding="utf-8")
-    print(f"Updated DATA_VERSION -> {version}")
+    meta = json.loads(META_PATH.read_text(encoding="utf-8"))
+    version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
+    meta["dataVersion"] = version
+    META_PATH.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"Updated dataVersion -> {version}")
     return True
 
 
@@ -374,7 +370,7 @@ def main() -> int:
     print(f"Wrote {STANDINGS_PATH.relative_to(ROOT)}")
 
     if not skip_version_bump:
-        bump_data_version()
+        bump_edition_meta()
 
     return 0
 

@@ -5,4 +5,5 @@ interface Env {
   GITHUB_REPO: string;
   GITHUB_BRANCH?: string;
   ADMIN_API_KEY: string;
+  DEFAULT_EDITION?: string;
 }

@@ -91,6 +91,12 @@ def compute_standings_from_matches(teams: list[dict], matches: list[dict]) -> li
     return rows
 
 
+def bump_edition_meta(meta: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
+    updated = {**meta, "dataVersion": version}
+    return updated, version
+
+
 def bump_data_version(data_loader_source: str) -> str:
     version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
     updated, count = re.subn(
@@ -107,7 +113,7 @@ def bump_data_version(data_loader_source: str) -> str:
 def apply_match_update(
     matches: list[dict],
     teams: list[dict],
-    data_loader_source: str,
+    edition_meta: dict[str, Any],
     *,
     match_id: str,
     home_score: int | None,
@@ -134,11 +140,12 @@ def apply_match_update(
     target["status"] = status
 
     standings = compute_standings_from_matches(teams, updated_matches)
-    new_loader = bump_data_version(data_loader_source)
+    new_meta, data_version = bump_edition_meta(edition_meta)
 
     return {
         "match": target,
         "matches": updated_matches,
         "standings": standings,
-        "data_loader_ts": new_loader,
+        "edition_meta": new_meta,
+        "data_version": data_version,
     }

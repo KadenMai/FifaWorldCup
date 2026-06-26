@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { useEditionPath } from '../context/EditionContext';
 import { useLanguage, useT } from '../context/LanguageContext';
 import GoogleSportsPanel from '../components/GoogleSportsPanel';
 import MatchScoreModal from '../components/MatchScoreModal';
@@ -14,6 +15,7 @@ export default function MatchDetailPage() {
   const { matchId } = useParams<{ matchId: string }>();
   const { data, loading, error, applyScoreUpdate } = useData();
   const t = useT();
+  const editionPath = useEditionPath();
   const { locale } = useLanguage();
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
 
@@ -27,7 +29,7 @@ export default function MatchDetailPage() {
     return (
       <div className="container error-state">
         {t('match.notFound')}{' '}
-        <Link to="/">{t('common.backToMatches')}</Link>
+        <Link to={editionPath('/')}>{t('common.backToMatches')}</Link>
       </div>
     );
   }

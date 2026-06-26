@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Update one match locally, recompute standings, bump DATA_VERSION.
+Update one match locally, recompute standings, bump edition meta dataVersion.
 
 Usage:
   python scripts/manual_update_match.py match-001 2 1 Finished
   python scripts/manual_update_match.py match-025 --status Scheduled
+  python scripts/manual_update_match.py match-001 2 1 Finished --edition 2026
 
 Then commit and push — GitHub Pages will redeploy.
 """
@@ -21,10 +22,11 @@ sys.path.insert(0, str(ROOT / "azure-functions" / "shared"))
 
 from score_update_lib import apply_match_update  # noqa: E402
 
-MATCHES_PATH = ROOT / "public" / "data" / "matches.json"
-STANDINGS_PATH = ROOT / "public" / "data" / "standings.json"
-TEAMS_PATH = ROOT / "public" / "data" / "teams.json"
-DATA_LOADER_PATH = ROOT / "src" / "data" / "dataLoader.ts"
+DEFAULT_EDITION = "2026"
+
+
+def edition_dir(edition: str) -> Path:
+    return ROOT / "public" / "data" / edition
 
 
 def load_json(path: Path):
@@ -45,15 +47,21 @@ def main() -> int:
     parser.add_argument("away_score", nargs="?", type=int, help="Away goals")
     parser.add_argument("status", nargs="?", default="Finished", help="Match status")
     parser.add_argument("--status", dest="status_opt", help="Override status")
+    parser.add_argument("--edition", default=DEFAULT_EDITION, help="Tournament edition (default: 2026)")
     args = parser.parse_args()
 
     status = args.status_opt or args.status
+    data_dir = edition_dir(args.edition)
+    matches_path = data_dir / "matches.json"
+    standings_path = data_dir / "standings.json"
+    teams_path = data_dir / "teams.json"
+    meta_path = data_dir / "meta.json"
 
     try:
         result = apply_match_update(
-            load_json(MATCHES_PATH),
-            load_json(TEAMS_PATH),
-            DATA_LOADER_PATH.read_text(encoding="utf-8"),
+            load_json(matches_path),
+            load_json(teams_path),
+            load_json(meta_path),
             match_id=args.match_id,
             home_score=args.home_score,
             away_score=args.away_score,
@@ -63,13 +71,13 @@ def main() -> int:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    save_json(MATCHES_PATH, result["matches"])
-    save_json(STANDINGS_PATH, result["standings"])
-    DATA_LOADER_PATH.write_text(result["data_loader_ts"], encoding="utf-8")
+    save_json(matches_path, result["matches"])
+    save_json(standings_path, result["standings"])
+    save_json(meta_path, result["edition_meta"])
 
     match = result["match"]
     print(f"Updated {match['id']}: {match['homeScore']} - {match['awayScore']} ({match['status']})")
-    print(f"Wrote {MATCHES_PATH.name}, {STANDINGS_PATH.name}, dataLoader.ts")
+    print(f"Wrote {matches_path.name}, {standings_path.name}, {meta_path.name} under {args.edition}/")
     print("Next: git add, commit, push — GitHub Pages will redeploy.")
     return 0
 

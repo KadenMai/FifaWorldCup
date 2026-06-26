@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Match, Stadium, Team } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useEditionPath } from '../context/EditionContext';
 import TeamFlag from './TeamFlag';
 import { resolveMatchTeams } from '../utils/bracketHelpers';
 import {
@@ -41,6 +42,7 @@ export default function GoogleMatchRow({
 }: GoogleMatchRowProps) {
   const { locale: ctxLocale, t } = useLanguage();
   const loc = locale ?? ctxLocale;
+  const editionPath = useEditionPath();
 
   const { homeTeamId, awayTeamId } = resolveMatchTeams(match, teams, allMatches);
   const displayMatch = { ...match, homeTeamId, awayTeamId };
@@ -63,7 +65,7 @@ export default function GoogleMatchRow({
     : `${match.homeScore ?? '-'} - ${match.awayScore ?? '-'}`;
 
   return (
-    <Link to={`/matches/${match.id}`} className="g-match-row g-match-row-readable">
+    <Link to={editionPath(`/matches/${match.id}`)} className="g-match-row g-match-row-readable">
       <div className="g-match-row-top">
         <span className="g-match-round">
           {roundLabel}

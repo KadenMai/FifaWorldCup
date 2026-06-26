@@ -1,5 +1,5 @@
 /**
- * Append knockout fixtures (match-073 … match-104) to public/data/matches.json
+ * Append knockout fixtures (match-073 … match-104) to public/data/2026/matches.json
  * Uses the same fixture list as src/utils/bracketHelpers.ts
  */
 import fs from 'node:fs';
@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+const EDITION = '2026';
+const dataDir = path.join(ROOT, 'public/data', EDITION);
 
 const ROUND_LABELS = {
   r32: 'Round of 32',
@@ -54,15 +56,15 @@ const FIXTURES = [
   { id: 104, round: 'final', date: '2026-07-19', time: '15:00', timezone: 'America/New_York', stadiumId: 'metlife-stadium' },
 ];
 
-function bumpDataVersion() {
-  const loaderPath = path.join(ROOT, 'src/data/dataLoader.ts');
-  let src = fs.readFileSync(loaderPath, 'utf8');
+function bumpEditionMeta() {
+  const metaPath = path.join(dataDir, 'meta.json');
+  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
   const stamp = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 12);
-  src = src.replace(/const DATA_VERSION = '[^']+';/, `const DATA_VERSION = '${stamp}';`);
-  fs.writeFileSync(loaderPath, src);
+  meta.dataVersion = stamp;
+  fs.writeFileSync(metaPath, `${JSON.stringify(meta, null, 2)}\n`);
 }
 
-const matchesPath = path.join(ROOT, 'public/data/matches.json');
+const matchesPath = path.join(dataDir, 'matches.json');
 const matches = JSON.parse(fs.readFileSync(matchesPath, 'utf8'));
 const groupOnly = matches.filter((m) => m.round === 'Group Stage' || m.group);
 const existingKnockout = new Map(
@@ -89,5 +91,5 @@ const knockoutRows = FIXTURES.map((f) => {
 
 const merged = [...groupOnly, ...knockoutRows];
 fs.writeFileSync(matchesPath, `${JSON.stringify(merged, null, 2)}\n`);
-bumpDataVersion();
+bumpEditionMeta();
 console.log(`Wrote ${merged.length} matches (${groupOnly.length} group + ${knockoutRows.length} knockout)`);

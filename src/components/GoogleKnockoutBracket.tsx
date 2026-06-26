@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import type { Match, Team } from '../types';
 import { useLanguage, useT } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
+import { useEditionPath } from '../context/EditionContext';
 import { formatMatchKickoff, getTeamById } from '../utils/helpers';
 import {
   BRACKET_TREE_ROUNDS,
@@ -72,17 +73,19 @@ function BracketCard({
   tbd,
   locale,
   highlight,
+  editionPath,
 }: {
   match: ResolvedBracketMatch;
   teams: Team[];
   tbd: string;
   locale: string;
   highlight?: boolean;
+  editionPath: (suffix?: string) => string;
 }) {
   const matchId = `match-${String(match.id).padStart(3, '0')}`;
 
   return (
-    <Link to={`/matches/${matchId}`} className={`g-bracket-card g-bracket-card-link${highlight ? ' g-bracket-card-final' : ''}`}>
+    <Link to={editionPath(`/matches/${matchId}`)} className={`g-bracket-card g-bracket-card-link${highlight ? ' g-bracket-card-final' : ''}`}>
       <div className="g-bracket-card-time">
         {formatMatchKickoff(match.date, match.time, match.timezone, locale)}
       </div>
@@ -95,6 +98,7 @@ function BracketCard({
 export default function GoogleKnockoutBracket({ matches, teams }: GoogleKnockoutBracketProps) {
   const t = useT();
   const { locale, lang } = useLanguage();
+  const editionPath = useEditionPath();
   const canvasRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -249,6 +253,7 @@ export default function GoogleKnockoutBracket({ matches, teams }: GoogleKnockout
                     tbd={t('bracket.tbd')}
                     locale={locale}
                     highlight={round === 'final'}
+                    editionPath={editionPath}
                   />
                 </div>
               ))}
@@ -265,6 +270,7 @@ export default function GoogleKnockoutBracket({ matches, teams }: GoogleKnockout
                     teams={teams}
                     tbd={t('bracket.tbd')}
                     locale={locale}
+                    editionPath={editionPath}
                   />
                 </div>
               )}

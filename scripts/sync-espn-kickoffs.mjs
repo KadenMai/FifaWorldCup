@@ -11,6 +11,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+const EDITION = '2026';
+const dataDir = path.join(ROOT, 'public/data', EDITION);
 
 const ESPN_TEAM_MAP = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'team-map.json'), 'utf8'),
@@ -137,20 +139,20 @@ function parseEspnEvents(espnData) {
   return byPair;
 }
 
-function bumpDataVersion() {
-  const loaderPath = path.join(ROOT, 'src/data/dataLoader.ts');
-  let src = fs.readFileSync(loaderPath, 'utf8');
+function bumpEditionMeta() {
+  const metaPath = path.join(dataDir, 'meta.json');
+  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
   const stamp = new Date()
     .toISOString()
     .replace(/[-:T.Z]/g, '')
     .slice(0, 12);
-  src = src.replace(/const DATA_VERSION = '[^']+';/, `const DATA_VERSION = '${stamp}';`);
-  fs.writeFileSync(loaderPath, src);
+  meta.dataVersion = stamp;
+  fs.writeFileSync(metaPath, `${JSON.stringify(meta, null, 2)}\n`);
   return stamp;
 }
 
 async function main() {
-  const matchesPath = path.join(ROOT, 'public/data/matches.json');
+  const matchesPath = path.join(dataDir, 'matches.json');
   const matches = JSON.parse(fs.readFileSync(matchesPath, 'utf8'));
 
   const espnData = await fetchEspnGroupStage();
@@ -192,9 +194,9 @@ async function main() {
   }
 
   fs.writeFileSync(matchesPath, `${JSON.stringify(matches, null, 2)}\n`);
-  const version = bumpDataVersion();
+  const version = bumpEditionMeta();
 
-  console.log(`\nUpdated ${updated} matches. DATA_VERSION=${version}`);
+  console.log(`\nUpdated ${updated} matches. dataVersion=${version}`);
   if (unmatched.length) {
     console.warn('Unmatched:', unmatched.join(', '));
     process.exitCode = 1;

@@ -17,15 +17,29 @@ from __future__ import annotations
 import base64
 import json
 import os
+import re
 from typing import Any
 
 from github_store import GitHubStore
 from score_update_lib import apply_match_update
 
-MATCHES_PATH = "public/data/matches.json"
-STANDINGS_PATH = "public/data/standings.json"
-TEAMS_PATH = "public/data/teams.json"
-DATA_LOADER_PATH = "src/data/dataLoader.ts"
+
+def _edition_paths(edition: str) -> dict[str, str]:
+    base = f"public/data/{edition}"
+    return {
+        "matches": f"{base}/matches.json",
+        "standings": f"{base}/standings.json",
+        "teams": f"{base}/teams.json",
+        "meta": f"{base}/meta.json",
+    }
+
+
+def _resolve_edition(body: dict[str, Any]) -> str | None:
+    raw = str(body.get("edition") or "").strip()
+    if re.fullmatch(r"\d{4}", raw):
+        return raw
+    fallback = os.environ.get("DEFAULT_EDITION", "2026").strip()
+    return fallback if re.fullmatch(r"\d{4}", fallback) else None
 
 
 def _get_method(event: dict[str, Any]) -> str:
@@ -116,20 +130,25 @@ def _handle_update_match(event: dict[str, Any]) -> dict[str, Any]:
     status = body.get("status", "Finished")
     home_score = body.get("homeScore")
     away_score = body.get("awayScore")
+    edition = _resolve_edition(body)
 
+    if not edition:
+        return _response(400, {"error": "edition is required (e.g. 2026)"})
     if not match_id:
         return _response(400, {"error": "matchId is required"})
 
+    paths = _edition_paths(edition)
+
     try:
         store = _store()
-        matches, matches_sha = store.read_json(MATCHES_PATH)
-        teams, _ = store.read_json(TEAMS_PATH)
-        loader_text, _ = store.read_text(DATA_LOADER_PATH)
+        matches, matches_sha = store.read_json(paths["matches"])
+        teams, _ = store.read_json(paths["teams"])
+        meta, meta_sha = store.read_json(paths["meta"])
 
         result = apply_match_update(
             matches,
             teams,
-            loader_text,
+            meta,
             match_id=match_id,
             home_score=home_score,
             away_score=away_score,
@@ -137,15 +156,14 @@ def _handle_update_match(event: dict[str, Any]) -> dict[str, Any]:
         )
 
         commit_msg = (
-            f"chore(data): update {match_id} "
+            f"chore(data): update {edition} {match_id} "
             f"({result['match']['homeScore']}-{result['match']['awayScore']} {status})"
         )
 
-        store.write_json(MATCHES_PATH, result["matches"], matches_sha, commit_msg)
-        _, standings_sha = store.read_json(STANDINGS_PATH)
-        store.write_json(STANDINGS_PATH, result["standings"], standings_sha, commit_msg)
-        _, loader_sha = store.read_text(DATA_LOADER_PATH)
-        store.write_text(DATA_LOADER_PATH, result["data_loader_ts"], loader_sha, commit_msg)
+        store.write_json(paths["matches"], result["matches"], matches_sha, commit_msg)
+        _, standings_sha = store.read_json(paths["standings"])
+        store.write_json(paths["standings"], result["standings"], standings_sha, commit_msg)
+        store.write_json(paths["meta"], result["edition_meta"], meta_sha, commit_msg)
 
         return _response(
             200,
@@ -153,6 +171,8 @@ def _handle_update_match(event: dict[str, Any]) -> dict[str, Any]:
                 "ok": True,
                 "match": result["match"],
                 "standingsUpdated": len(result["standings"]),
+                "edition": edition,
+                "dataVersion": result["data_version"],
             },
         )
     except ValueError as error:

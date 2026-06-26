@@ -7,7 +7,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dataDir = join(__dirname, '../public/data');
+const dataDir = join(__dirname, '../public/data/2026');
 
 const TEAMS = [
   { id: 'mexico', name: 'Mexico', shortName: 'MEX', flagCode: 'mx', group: 'A', confederation: 'CONCACAF', fifaRanking: 16 },

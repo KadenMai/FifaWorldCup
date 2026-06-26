@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Coach, Match, Team } from '../types';
+import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
 import { countTeamMatches } from '../utils/helpers';
@@ -13,9 +14,10 @@ interface TeamCardProps {
 export default function TeamCard({ team, coach, matches }: TeamCardProps) {
   const matchCount = countTeamMatches(team.id, matches);
   const t = useT();
+  const editionPath = useEditionPath();
 
   return (
-    <Link to={`/teams/${team.id}`} className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+    <Link to={editionPath(`/teams/${team.id}`)} className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <TeamFlag team={team} size={40} />
         <div style={{ flex: 1 }}>

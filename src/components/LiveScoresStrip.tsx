@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Match, Team } from '../types';
+import { useEditionPath } from '../context/EditionContext';
 import TeamFlag from './TeamFlag';
 import { getTeamById } from '../utils/helpers';
 
@@ -9,6 +10,7 @@ interface LiveScoresStripProps {
 }
 
 export default function LiveScoresStrip({ matches, teams }: LiveScoresStripProps) {
+  const editionPath = useEditionPath();
   const liveMatches = matches.filter((m) => m.status === 'Live');
 
   if (liveMatches.length === 0) return null;
@@ -19,7 +21,7 @@ export default function LiveScoresStrip({ matches, teams }: LiveScoresStripProps
         const home = getTeamById(teams, match.homeTeamId);
         const away = getTeamById(teams, match.awayTeamId);
         return (
-          <Link key={match.id} to={`/matches/${match.id}`} className="g-live-pill">
+          <Link key={match.id} to={editionPath(`/matches/${match.id}`)} className="g-live-pill">
             <span className="g-live-dot" />
             <TeamFlag team={home} size={18} />
             <span>{home?.shortName}</span>

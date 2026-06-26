@@ -9,6 +9,7 @@ export interface ScoreUpdateResponse {
 }
 
 export async function submitMatchScore(input: {
+  edition: string;
   matchId: string;
   homeScore: number | null;
   awayScore: number | null;
@@ -22,6 +23,7 @@ export async function submitMatchScore(input: {
       'X-Admin-Key': input.adminKey,
     },
     body: JSON.stringify({
+      edition: input.edition,
       matchId: input.matchId,
       homeScore: input.homeScore,
       awayScore: input.awayScore,

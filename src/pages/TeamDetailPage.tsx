@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useData } from '../context/DataContext';
+import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import MatchCard from '../components/MatchCard';
 import PlayerCard from '../components/PlayerCard';
@@ -12,6 +13,7 @@ export default function TeamDetailPage() {
   const { teamId } = useParams<{ teamId: string }>();
   const { data, loading, error } = useData();
   const t = useT();
+  const editionPath = useEditionPath();
 
   if (loading) return <LoadingState />;
   if (error || !data) return <ErrorState message={error ?? undefined} />;
@@ -23,7 +25,7 @@ export default function TeamDetailPage() {
     return (
       <div className="container error-state">
         {t('teams.notFound')}{' '}
-        <Link to="/teams">{t('common.backToTeams')}</Link>
+        <Link to={editionPath('/teams')}>{t('common.backToTeams')}</Link>
       </div>
     );
   }

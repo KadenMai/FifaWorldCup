@@ -11,6 +11,25 @@ npm install
 npm run dev
 ```
 
+### Default edition (`/` redirect)
+
+Control whether visiting `/` redirects to a tournament year (e.g. `/2026`) or shows the edition picker.
+
+| Variable | Where | Purpose |
+|----------|-------|---------|
+| `VITE_DEFAULT_EDITION=2026` | `.env.local` (local dev) | Redirect `/` → `/2026` when `/api/config` isn’t available |
+| `DEFAULT_EDITION=2026` | Cloudflare Pages → **Settings → Environment variables** | Same behavior in production |
+
+**Local setup:** create `.env.local` in the project root (same folder as `package.json`):
+
+```
+VITE_DEFAULT_EDITION=2026
+```
+
+Restart `npm run dev` after changing env vars. Leave the value empty or omit the file to show the edition picker at `/`.
+
+**Production:** set `DEFAULT_EDITION` in Cloudflare Pages (Production environment), then redeploy. The `/api/config` Pages Function reads this value.
+
 **Hosting (pick one):**
 
 | Platform | Auto-deploy workflow |

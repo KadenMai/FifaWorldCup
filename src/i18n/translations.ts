@@ -18,6 +18,11 @@ export const en = {
     weather: 'Weather',
     bracket: 'Bracket',
   },
+  editions: {
+    title: 'FIFA World Cup',
+    subtitle: 'Choose a tournament edition',
+    comingSoon: 'Coming soon',
+  },
   common: {
     loading: 'Loading...',
     error: 'Error',
@@ -204,6 +209,11 @@ export const vi: TranslationDict = {
     venues: 'Sân vận động',
     weather: 'Thời tiết',
     bracket: 'Vòng knock-out',
+  },
+  editions: {
+    title: 'FIFA World Cup',
+    subtitle: 'Chọn kỳ World Cup',
+    comingSoon: 'Sắp ra mắt',
   },
   common: {
     loading: 'Đang tải...',

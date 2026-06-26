@@ -1,0 +1,22 @@
+{
+  "editions": [
+    {
+      "id": "2026",
+      "name": "FIFA World Cup 2026",
+      "hosts": "USA · Canada · Mexico",
+      "available": true
+    },
+    {
+      "id": "2022",
+      "name": "FIFA World Cup 2022",
+      "hosts": "Qatar",
+      "available": false
+    },
+    {
+      "id": "2018",
+      "name": "FIFA World Cup 2018",
+      "hosts": "Russia",
+      "available": false
+    }
+  ]
+}

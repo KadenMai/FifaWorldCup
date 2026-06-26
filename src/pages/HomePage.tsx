@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
+import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import WorldCupHub from '../components/WorldCupHub';
 import SearchBar from '../components/SearchBar';
@@ -11,6 +12,7 @@ export default function HomePage() {
   const { data, loading, error } = useData();
   const [search, setSearch] = useState('');
   const t = useT();
+  const editionPath = useEditionPath();
 
   if (loading) return <LoadingState />;
   if (error || !data) return <ErrorState message={error ?? undefined} />;
@@ -44,7 +46,7 @@ export default function HomePage() {
           {filteredTeams.slice(0, 8).map((team) => (
             <Link
               key={team.id}
-              to={`/teams/${team.id}`}
+              to={editionPath(`/teams/${team.id}`)}
               className="g-match-row"
               style={{ display: 'flex', alignItems: 'center', gap: 12 }}
             >

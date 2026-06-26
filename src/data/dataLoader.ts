@@ -7,11 +7,27 @@ import type {
   Team,
   WeatherInfo,
 } from '../types';
+import { fetchJson } from '../utils/fetchJson';
 
-/** Bump when JSON data changes to bust browser/CDN cache */
-const DATA_VERSION = '202606260430';
+export interface EditionMeta {
+  id: string;
+  name: string;
+  hosts: string;
+  dataVersion: string;
+}
 
-let runtimeDataVersion = DATA_VERSION;
+export interface EditionSummary {
+  id: string;
+  name: string;
+  hosts: string;
+  available: boolean;
+}
+
+export interface EditionCatalog {
+  editions: EditionSummary[];
+}
+
+let runtimeDataVersion = '1';
 
 export function setRuntimeDataVersion(version: string): void {
   runtimeDataVersion = version;
@@ -21,30 +37,37 @@ export function getRuntimeDataVersion(): string {
   return runtimeDataVersion;
 }
 
-export async function loadJson<T>(fileName: string): Promise<T> {
-  const url = `${import.meta.env.BASE_URL}data/${fileName}?v=${runtimeDataVersion}`;
-  const response = await fetch(url, { cache: 'no-store' });
-
-  if (!response.ok) {
-    throw new Error(`Failed to load ${fileName}`);
-  }
-
-  return response.json();
+export async function loadEditionCatalog(): Promise<EditionCatalog> {
+  const url = `${import.meta.env.BASE_URL}data/index.json`;
+  return fetchJson<EditionCatalog>(url, { cache: 'no-store' });
 }
 
-export async function loadAllData() {
+export async function loadEditionMeta(edition: string): Promise<EditionMeta> {
+  const url = `${import.meta.env.BASE_URL}data/${edition}/meta.json`;
+  return fetchJson<EditionMeta>(url, { cache: 'no-store' });
+}
+
+export async function loadJson<T>(edition: string, fileName: string): Promise<T> {
+  const url = `${import.meta.env.BASE_URL}data/${edition}/${fileName}?v=${runtimeDataVersion}`;
+  return fetchJson<T>(url, { cache: 'no-store' });
+}
+
+export async function loadAllData(edition: string) {
+  const meta = await loadEditionMeta(edition);
+  setRuntimeDataVersion(meta.dataVersion);
+
   const [teams, players, coaches, matches, stadiums, standings, weather] =
     await Promise.all([
-      loadJson<Team[]>('teams.json'),
-      loadJson<Player[]>('players.json'),
-      loadJson<Coach[]>('coaches.json'),
-      loadJson<Match[]>('matches.json'),
-      loadJson<Stadium[]>('stadiums.json'),
-      loadJson<Standing[]>('standings.json'),
-      loadJson<WeatherInfo[]>('weather.json'),
+      loadJson<Team[]>(edition, 'teams.json'),
+      loadJson<Player[]>(edition, 'players.json'),
+      loadJson<Coach[]>(edition, 'coaches.json'),
+      loadJson<Match[]>(edition, 'matches.json'),
+      loadJson<Stadium[]>(edition, 'stadiums.json'),
+      loadJson<Standing[]>(edition, 'standings.json'),
+      loadJson<WeatherInfo[]>(edition, 'weather.json'),
     ]);
 
-  return { teams, players, coaches, matches, stadiums, standings, weather };
+  return { meta, teams, players, coaches, matches, stadiums, standings, weather };
 }
 
 export type AppData = Awaited<ReturnType<typeof loadAllData>>;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import type { Stadium } from '../../types';
+import { useEdition } from '../../context/EditionContext';
 import { useT } from '../../context/LanguageContext';
 import { getRuntimeDataVersion } from '../../data/dataLoader';
 
@@ -34,25 +35,25 @@ const GEO_COUNTRY_KEY: Record<string, keyof typeof COUNTRY_COLORS> = {
   MEX: 'Mexico',
 };
 
-const geoCache: { countries?: HostGeoJson; admin1?: Admin1GeoJson } = {};
+const geoCache: Record<string, { countries?: HostGeoJson; admin1?: Admin1GeoJson }> = {};
 
-async function loadGeoJson<T>(fileName: string): Promise<T> {
-  const url = `${import.meta.env.BASE_URL}data/${fileName}?v=${getRuntimeDataVersion()}`;
+async function loadGeoJson<T>(edition: string, fileName: string): Promise<T> {
+  const url = `${import.meta.env.BASE_URL}data/${edition}/${fileName}?v=${getRuntimeDataVersion()}`;
   const response = await fetch(url, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Failed to load ${fileName}`);
   return response.json() as Promise<T>;
 }
 
-async function loadMapData() {
-  if (geoCache.countries && geoCache.admin1) {
-    return { countries: geoCache.countries, admin1: geoCache.admin1 };
+async function loadMapData(edition: string) {
+  const cache = geoCache[edition] ?? {};
+  if (cache.countries && cache.admin1) {
+    return { countries: cache.countries, admin1: cache.admin1 };
   }
   const [countries, admin1] = await Promise.all([
-    loadGeoJson<HostGeoJson>('north-america.geojson'),
-    loadGeoJson<Admin1GeoJson>('admin1-boundaries.geojson'),
+    loadGeoJson<HostGeoJson>(edition, 'north-america.geojson'),
+    loadGeoJson<Admin1GeoJson>(edition, 'admin1-boundaries.geojson'),
   ]);
-  geoCache.countries = countries;
-  geoCache.admin1 = admin1;
+  geoCache[edition] = { countries, admin1 };
   return { countries, admin1 };
 }
 
@@ -68,6 +69,7 @@ export default function StadiumMap({ stadiums, onSelect }: StadiumMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const transformRef = useRef<d3.ZoomTransform | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
+  const { edition } = useEdition();
   const t = useT();
 
   useEffect(() => {
@@ -94,7 +96,7 @@ export default function StadiumMap({ stadiums, onSelect }: StadiumMapProps) {
 
       let mapData: { countries: HostGeoJson; admin1: Admin1GeoJson };
       try {
-        mapData = await loadMapData();
+        mapData = await loadMapData(edition);
         if (cancelled) return;
         setMapError(null);
       } catch {
@@ -349,7 +351,7 @@ export default function StadiumMap({ stadiums, onSelect }: StadiumMapProps) {
       d3.select(container).selectAll('.d3-tooltip').remove();
       d3.select(container).selectAll('.stadium-map-controls').remove();
     };
-  }, [stadiums, onSelect, t]);
+  }, [stadiums, onSelect, t, edition]);
 
   return (
     <div ref={containerRef} className="chart-container stadium-map-wrap" style={{ position: 'relative' }}>

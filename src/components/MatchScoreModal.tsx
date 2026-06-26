@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Match, MatchStatus, Team } from '../types';
+import { useEdition } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import { submitMatchScore } from '../api/updateMatch';
 import { getStoredAdminKey, storeAdminKey } from '../utils/adminAuth';
@@ -25,6 +26,7 @@ export default function MatchScoreModal({
   onSaved,
 }: MatchScoreModalProps) {
   const t = useT();
+  const { edition } = useEdition();
   const [homeScore, setHomeScore] = useState('');
   const [awayScore, setAwayScore] = useState('');
   const [status, setStatus] = useState<MatchStatus>(match.status);
@@ -80,6 +82,7 @@ export default function MatchScoreModal({
 
     try {
       const result = await submitMatchScore({
+        edition,
         matchId: match.id,
         homeScore: parsedHome,
         awayScore: parsedAway,

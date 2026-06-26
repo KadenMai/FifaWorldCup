@@ -5,15 +5,21 @@ interface Env {
   GITHUB_REPO?: string;
   GITHUB_BRANCH?: string;
   ADMIN_API_KEY?: string;
+  DEFAULT_EDITION?: string;
 }
 
-const MATCHES_PATH = 'public/data/matches.json';
+function resolveEdition(env: Env): string {
+  const raw = env.DEFAULT_EDITION?.trim() ?? '';
+  return /^\d{4}$/.test(raw) ? raw : '2026';
+}
 
 export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   const token = env.GITHUB_TOKEN?.trim() ?? '';
   const repo = env.GITHUB_REPO?.trim() ?? '';
   const branch = env.GITHUB_BRANCH?.trim() || 'main';
   const adminKey = env.ADMIN_API_KEY?.trim() ?? '';
+  const edition = resolveEdition(env);
+  const matchesPath = `public/data/${edition}/matches.json`;
 
   const providedAdmin = request.headers.get('X-Admin-Key')?.trim() ?? '';
   const isAdmin = Boolean(adminKey) && providedAdmin === adminKey;
@@ -31,7 +37,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   if (githubConfigured) {
     try {
       const store = new GitHubStore(token, repo, branch);
-      const file = await store.readText(MATCHES_PATH);
+      const file = await store.readText(matchesPath);
       githubTokenWorks = true;
       matchesFileSha = file.sha;
     } catch (error) {
@@ -58,6 +64,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
     hasAdminApiKey,
     githubRepo: repo || undefined,
     githubBranch: branch,
+    edition,
     matchesFileSha,
     githubTokenLength: token ? token.length : 0,
   };

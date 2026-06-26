@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Match, Stadium, Team } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useEditionPath } from '../context/EditionContext';
 import TeamFlag from './TeamFlag';
 import {
   formatDate,
@@ -18,6 +19,7 @@ interface MatchCardProps {
 
 export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
   const { locale, t } = useLanguage();
+  const editionPath = useEditionPath();
   const home = getTeamById(teams, match.homeTeamId);
   const away = getTeamById(teams, match.awayTeamId);
   const winner = getMatchWinner(match, teams);
@@ -33,7 +35,7 @@ export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
         : 'badge-scheduled';
 
   return (
-    <Link to={`/matches/${match.id}`} className="card match-card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+    <Link to={editionPath(`/matches/${match.id}`)} className="card match-card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <span className={`badge ${statusClass}`}>{statusLabel}</span>
         <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>

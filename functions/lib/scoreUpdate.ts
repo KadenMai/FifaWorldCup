@@ -115,6 +115,15 @@ export function computeStandingsFromMatches(
   });
 }
 
+export function bumpEditionMeta<T extends { dataVersion: string }>(meta: T): { meta: T; dataVersion: string } {
+  const dataVersion = new Date().toISOString().replace(/\D/g, '').slice(0, 12);
+  return {
+    meta: { ...meta, dataVersion },
+    dataVersion,
+  };
+}
+
+/** @deprecated Use bumpEditionMeta */
 export function bumpDataVersion(source: string): string {
   const version = new Date().toISOString().replace(/\D/g, '').slice(0, 12);
   const updated = source.replace(/const DATA_VERSION = '[^']+';/, `const DATA_VERSION = '${version}';`);
@@ -139,7 +148,7 @@ export interface ScoreUpdateInput {
 export function applyMatchUpdate(
   matches: MatchRecord[],
   teams: TeamRecord[],
-  dataLoaderSource: string,
+  editionMeta: { dataVersion: string },
   input: ScoreUpdateInput
 ) {
   if (!VALID_STATUSES.has(input.status)) {
@@ -166,14 +175,13 @@ export function applyMatchUpdate(
   target.status = input.status;
 
   const standings = computeStandingsFromMatches(teams, updatedMatches);
-  const dataLoaderTs = bumpDataVersion(dataLoaderSource);
-  const dataVersion = extractDataVersion(dataLoaderTs);
+  const { meta: updatedMeta, dataVersion } = bumpEditionMeta(editionMeta);
 
   return {
     match: target,
     matches: updatedMatches,
     standings,
-    dataLoaderTs,
+    editionMeta: updatedMeta,
     dataVersion,
   };
 }

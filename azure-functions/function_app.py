@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -13,10 +14,23 @@ from score_update_lib import apply_match_update  # noqa: E402
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-MATCHES_PATH = "public/data/matches.json"
-STANDINGS_PATH = "public/data/standings.json"
-TEAMS_PATH = "public/data/teams.json"
-DATA_LOADER_PATH = "src/data/dataLoader.ts"
+
+def _edition_paths(edition: str) -> dict[str, str]:
+    base = f"public/data/{edition}"
+    return {
+        "matches": f"{base}/matches.json",
+        "standings": f"{base}/standings.json",
+        "teams": f"{base}/teams.json",
+        "meta": f"{base}/meta.json",
+    }
+
+
+def _resolve_edition(body: dict | None) -> str | None:
+    raw = str((body or {}).get("edition") or "").strip()
+    if re.fullmatch(r"\d{4}", raw):
+        return raw
+    fallback = os.environ.get("DEFAULT_EDITION", "2026").strip()
+    return fallback if re.fullmatch(r"\d{4}", fallback) else None
 
 
 def _check_admin(req: func.HttpRequest) -> bool:
@@ -63,39 +77,48 @@ def update_match(req: func.HttpRequest) -> func.HttpResponse:
     status = (body or {}).get("status", "Finished")
     home_score = (body or {}).get("homeScore")
     away_score = (body or {}).get("awayScore")
+    edition = _resolve_edition(body)
 
+    if not edition:
+        return _json_response({"error": "edition is required (e.g. 2026)"}, status_code=400)
     if not match_id:
         return _json_response({"error": "matchId is required"}, status_code=400)
 
+    paths = _edition_paths(edition)
+
     try:
         store = _store()
-        matches, matches_sha = store.read_json(MATCHES_PATH)
-        teams, _ = store.read_json(TEAMS_PATH)
-        loader_text, loader_sha = store.read_text(DATA_LOADER_PATH)
+        matches, matches_sha = store.read_json(paths["matches"])
+        teams, _ = store.read_json(paths["teams"])
+        meta, meta_sha = store.read_json(paths["meta"])
 
         result = apply_match_update(
             matches,
             teams,
-            loader_text,
+            meta,
             match_id=match_id,
             home_score=home_score,
             away_score=away_score,
             status=status,
         )
 
-        commit_msg = f"chore(data): update {match_id} ({result['match']['homeScore']}-{result['match']['awayScore']} {status})"
+        commit_msg = (
+            f"chore(data): update {edition} {match_id} "
+            f"({result['match']['homeScore']}-{result['match']['awayScore']} {status})"
+        )
 
-        store.write_json(MATCHES_PATH, result["matches"], matches_sha, commit_msg)
-        _, standings_sha = store.read_json(STANDINGS_PATH)
-        store.write_json(STANDINGS_PATH, result["standings"], standings_sha, commit_msg)
-        _, loader_sha = store.read_text(DATA_LOADER_PATH)
-        store.write_text(DATA_LOADER_PATH, result["data_loader_ts"], loader_sha, commit_msg)
+        store.write_json(paths["matches"], result["matches"], matches_sha, commit_msg)
+        _, standings_sha = store.read_json(paths["standings"])
+        store.write_json(paths["standings"], result["standings"], standings_sha, commit_msg)
+        store.write_json(paths["meta"], result["edition_meta"], meta_sha, commit_msg)
 
         return _json_response(
             {
                 "ok": True,
                 "match": result["match"],
                 "standingsUpdated": len(result["standings"]),
+                "edition": edition,
+                "dataVersion": result["data_version"],
             }
         )
     except ValueError as error:

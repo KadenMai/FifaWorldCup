@@ -1,33 +1,37 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useEdition } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
   const location = useLocation();
+  const { meta, path } = useEdition();
   const t = useT();
 
   const desktopItems = [
-    { to: '/', label: t('nav.home') },
-    { to: '/today', label: t('nav.today') },
-    { to: '/teams', label: t('nav.teams') },
-    { to: '/players', label: t('nav.players') },
-    { to: '/coaches', label: t('nav.coaches') },
-    { to: '/locations', label: t('nav.locations') },
-    { to: '/standings', label: t('nav.standings') },
-    { to: '/weather', label: t('nav.weather') },
+    { to: path(''), label: t('nav.home') },
+    { to: path('/today'), label: t('nav.today') },
+    { to: path('/teams'), label: t('nav.teams') },
+    { to: path('/players'), label: t('nav.players') },
+    { to: path('/coaches'), label: t('nav.coaches') },
+    { to: path('/locations'), label: t('nav.locations') },
+    { to: path('/standings'), label: t('nav.standings') },
+    { to: path('/weather'), label: t('nav.weather') },
   ];
 
-  const isActive = (path: string) =>
-    path === '/'
-      ? location.pathname === '/'
-      : location.pathname.startsWith(path);
+  const isActive = (to: string) => {
+    if (to === path('')) {
+      return location.pathname === path('') || location.pathname === `/${meta.id}`;
+    }
+    return location.pathname.startsWith(to);
+  };
 
   return (
     <header className="site-header">
       <div className="container">
-        <Link to="/" className="logo">
+        <Link to={path('')} className="logo">
           <span>🏆</span>
-          <span>{t('app.title')}</span>
+          <span>{meta.name}</span>
         </Link>
         <div className="header-actions">
           <nav className="top-nav">
@@ -50,21 +54,25 @@ export default function Header() {
 
 export function BottomNav() {
   const location = useLocation();
+  const { path } = useEdition();
   const t = useT();
 
   const navItems = [
-    { to: '/', label: t('nav.matches'), icon: '⚽' },
-    { to: '/standings', label: t('nav.standings'), icon: '📊' },
-    { to: '/teams', label: t('nav.teams'), icon: '🏳️' },
-    { to: '/locations', label: t('nav.venues'), icon: '🏟️' },
-    { to: '/weather', label: t('nav.weather'), icon: '🌤️' },
+    { to: path(''), label: t('nav.matches'), icon: '⚽' },
+    { to: path('/standings'), label: t('nav.standings'), icon: '📊' },
+    { to: path('/teams'), label: t('nav.teams'), icon: '🏳️' },
+    { to: path('/locations'), label: t('nav.venues'), icon: '🏟️' },
+    { to: path('/weather'), label: t('nav.weather'), icon: '🌤️' },
   ];
 
-  const isBottomNavActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/' || location.pathname.startsWith('/matches/');
+  const isBottomNavActive = (to: string) => {
+    if (to === path('')) {
+      return (
+        location.pathname === path('') ||
+        location.pathname.startsWith(path('/matches/'))
+      );
     }
-    return location.pathname.startsWith(path);
+    return location.pathname.startsWith(to);
   };
 
   return (

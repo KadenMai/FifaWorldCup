@@ -22,17 +22,37 @@ const DataContext = createContext<DataContextValue>({
   applyScoreUpdate: () => {},
 });
 
-export function DataProvider({ children }: { children: ReactNode }) {
+export function DataProvider({
+  edition,
+  children,
+}: {
+  edition: string;
+  children: ReactNode;
+}) {
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadAllData()
-      .then(setData)
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    loadAllData(edition)
+      .then((loaded) => {
+        if (!cancelled) setData(loaded);
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [edition]);
 
   const applyScoreUpdate = useCallback((result: ScoreUpdateResult) => {
     if (result.dataVersion) {
@@ -46,6 +66,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
           match.id === result.match.id ? { ...match, ...result.match } : match
         ),
         standings: result.standings,
+        meta: result.dataVersion
+          ? { ...prev.meta, dataVersion: result.dataVersion }
+          : prev.meta,
       };
     });
   }, []);

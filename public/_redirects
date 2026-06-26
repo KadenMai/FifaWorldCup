@@ -1,3 +1,3 @@
 # SPA fallback — serve index.html for client-side routes (Cloudflare Pages)
-# Static files (/assets/*, /data/*) are matched first and are not redirected.
+# Static files (/assets/*, /data/*) and Pages Functions (/api/*) are matched first.
 /*    /index.html   200

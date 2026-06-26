@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Match, Standing, Team } from '../types';
+import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
 import type { TeamFormData } from '../utils/standingsHelpers';
@@ -39,6 +40,7 @@ export default function GoogleGroupTable({
   formMap,
 }: GoogleGroupTableProps) {
   const t = useT();
+  const editionPath = useEditionPath();
   const rows = getMergedGroupStandings(group, standings, teams, matches);
 
   if (rows.length === 0) return null;
@@ -73,7 +75,7 @@ export default function GoogleGroupTable({
                 <tr key={row.teamId} className={qualified ? 'g-row-qualified' : ''}>
                   <td className="g-col-rank">{idx + 1}</td>
                   <td className="g-col-team">
-                    <Link to={`/teams/${row.teamId}`} className="g-team-link">
+                    <Link to={editionPath(`/teams/${row.teamId}`)} className="g-team-link">
                       <TeamFlag team={team} size={20} />
                       <span>{team?.name ?? row.teamId}</span>
                     </Link>

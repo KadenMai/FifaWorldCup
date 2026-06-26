@@ -6,18 +6,31 @@ interface Env {
   GITHUB_REPO: string;
   GITHUB_BRANCH?: string;
   ADMIN_API_KEY: string;
+  DEFAULT_EDITION?: string;
 }
 
-const MATCHES_PATH = 'public/data/matches.json';
-const STANDINGS_PATH = 'public/data/standings.json';
-const TEAMS_PATH = 'public/data/teams.json';
-const DATA_LOADER_PATH = 'src/data/dataLoader.ts';
+interface EditionMetaFile {
+  id: string;
+  name: string;
+  hosts: string;
+  dataVersion: string;
+}
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
+
+function editionPaths(edition: string) {
+  const base = `public/data/${edition}`;
+  return {
+    matches: `${base}/matches.json`,
+    standings: `${base}/standings.json`,
+    teams: `${base}/teams.json`,
+    meta: `${base}/meta.json`,
+  };
+}
 
 function jsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
@@ -34,6 +47,13 @@ function checkAdmin(request: Request, env: Env): boolean {
   if (!expected) return false;
   const provided = request.headers.get('X-Admin-Key')?.trim() ?? '';
   return Boolean(provided) && provided === expected;
+}
+
+function resolveEdition(raw: unknown, env: Env): string | null {
+  const edition = typeof raw === 'string' ? raw.trim() : '';
+  if (/^\d{4}$/.test(edition)) return edition;
+  const fallback = env.DEFAULT_EDITION?.trim() ?? '';
+  return /^\d{4}$/.test(fallback) ? fallback : null;
 }
 
 export const onRequestOptions: PagesFunction<Env> = async () =>
@@ -57,14 +77,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse({ error: 'Invalid JSON body' }, 400);
   }
 
+  const edition = resolveEdition(body.edition, env);
   const matchId = typeof body.matchId === 'string' ? body.matchId : '';
   const status = (typeof body.status === 'string' ? body.status : 'Finished') as MatchStatus;
   const homeScore = body.homeScore as number | null | undefined;
   const awayScore = body.awayScore as number | null | undefined;
 
+  if (!edition) {
+    return jsonResponse({ error: 'edition is required (e.g. 2026)' }, 400);
+  }
   if (!matchId) {
     return jsonResponse({ error: 'matchId is required' }, 400);
   }
+
+  const paths = editionPaths(edition);
 
   try {
     const store = new GitHubStore(
@@ -73,30 +99,30 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       env.GITHUB_BRANCH?.trim() || 'main'
     );
 
-    const { data: matches, sha: matchesSha } = await store.readJson<MatchRecord[]>(MATCHES_PATH);
-    const { data: teams } = await store.readJson<TeamRecord[]>(TEAMS_PATH);
-    const loaderFile = await store.readText(DATA_LOADER_PATH);
+    const { data: matches, sha: matchesSha } = await store.readJson<MatchRecord[]>(paths.matches);
+    const { data: teams } = await store.readJson<TeamRecord[]>(paths.teams);
+    const { data: meta, sha: metaSha } = await store.readJson<EditionMetaFile>(paths.meta);
 
-    const result = applyMatchUpdate(matches, teams, loaderFile.content, {
+    const result = applyMatchUpdate(matches, teams, meta, {
       matchId,
       homeScore,
       awayScore,
       status,
     });
 
-    const commitMsg = `chore(data): update ${matchId} (${result.match.homeScore}-${result.match.awayScore} ${status})`;
+    const commitMsg = `chore(data): update ${edition} ${matchId} (${result.match.homeScore}-${result.match.awayScore} ${status})`;
 
-    await store.writeJson(MATCHES_PATH, result.matches, matchesSha, commitMsg);
-    const { sha: standingsSha } = await store.readJson(STANDINGS_PATH);
-    await store.writeJson(STANDINGS_PATH, result.standings, standingsSha, commitMsg);
-    const loaderSha = (await store.readText(DATA_LOADER_PATH)).sha;
-    await store.writeText(DATA_LOADER_PATH, result.dataLoaderTs, loaderSha, commitMsg);
+    await store.writeJson(paths.matches, result.matches, matchesSha, commitMsg);
+    const { sha: standingsSha } = await store.readJson(paths.standings);
+    await store.writeJson(paths.standings, result.standings, standingsSha, commitMsg);
+    await store.writeJson(paths.meta, result.editionMeta, metaSha, commitMsg);
 
     return jsonResponse({
       ok: true,
       match: result.match,
       standings: result.standings,
       dataVersion: result.dataVersion,
+      edition,
       standingsUpdated: result.standings.length,
     });
   } catch (error) {
