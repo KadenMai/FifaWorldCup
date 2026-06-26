@@ -8,7 +8,7 @@ import GoogleStandings from './GoogleStandings';
 import { GoogleMatchDateGroup, GoogleMatchPastSection } from './GoogleMatchRow';
 import LiveScoresStrip from './LiveScoresStrip';
 import KnockoutBracket from './d3/KnockoutBracket';
-import { getTodayString, getGroupsFromTeams, shouldExpandMatchDay } from '../utils/helpers';
+import { getTodayString, getGroupsFromTeams } from '../utils/helpers';
 
 interface WorldCupHubProps {
   data: AppData;
@@ -50,8 +50,10 @@ export default function WorldCupHub({
     });
   }, [matches, matchesFilter]);
 
-  const { activeDays, pastDays } = useMemo(() => {
-    const active: [string, Match[]][] = [];
+  const { activeDays, futureDays, pastDays } = useMemo(() => {
+    const today = getTodayString();
+    const todayList: [string, Match[]][] = [];
+    const future: [string, Match[]][] = [];
     const past: [string, Match[]][] = [];
 
     const map = new Map<string, Match[]>();
@@ -62,17 +64,16 @@ export default function WorldCupHub({
     });
 
     for (const [date, dateMatches] of map.entries()) {
-      if (shouldExpandMatchDay(dateMatches)) {
-        active.push([date, dateMatches]);
-      } else {
-        past.push([date, dateMatches]);
-      }
+      if (date === today) todayList.push([date, dateMatches]);
+      else if (date > today) future.push([date, dateMatches]);
+      else past.push([date, dateMatches]);
     }
 
-    active.sort(([a], [b]) => a.localeCompare(b));
+    todayList.sort(([a], [b]) => a.localeCompare(b));
+    future.sort(([a], [b]) => a.localeCompare(b));
     past.sort(([a], [b]) => b.localeCompare(a));
 
-    return { activeDays: active, pastDays: past };
+    return { activeDays: todayList, futureDays: future, pastDays: past };
   }, [displayMatches]);
 
   const liveCount = matches.filter((m) => m.status === 'Live').length;
@@ -106,6 +107,20 @@ export default function WorldCupHub({
                   teams={teams}
                   stadiums={stadiums}
                   locale={locale}
+                  initialExpanded
+                  allMatches={matches}
+                />
+              ))}
+              {futureDays.map(([date, dateMatches]) => (
+                <GoogleMatchDateGroup
+                  key={date}
+                  date={date}
+                  matches={dateMatches}
+                  teams={teams}
+                  stadiums={stadiums}
+                  locale={locale}
+                  initialExpanded={false}
+                  allMatches={matches}
                 />
               ))}
               <GoogleMatchPastSection
@@ -113,6 +128,7 @@ export default function WorldCupHub({
                 teams={teams}
                 stadiums={stadiums}
                 locale={locale}
+                allMatches={matches}
               />
             </>
           )}

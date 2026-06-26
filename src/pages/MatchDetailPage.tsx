@@ -7,7 +7,8 @@ import MatchScoreModal from '../components/MatchScoreModal';
 import WeatherCard from '../components/WeatherCard';
 import { ErrorState, LoadingState } from '../components/PageState';
 import TeamFlag from '../components/TeamFlag';
-import { formatDate, formatMatchTime, getMatchWinner, getTeamById } from '../utils/helpers';
+import { formatDate, formatMatchTime, getMatchWinner, getTeamById, translateMatchRound, formatStadiumLabel } from '../utils/helpers';
+import { resolveMatchTeams } from '../utils/bracketHelpers';
 
 export default function MatchDetailPage() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -20,29 +21,33 @@ export default function MatchDetailPage() {
   if (error || !data) return <ErrorState message={error ?? undefined} />;
 
   const { teams, matches, stadiums, weather } = data;
-  const match = matches.find((m) => m.id === matchId);
+  const rawMatch = matches.find((m) => m.id === matchId);
 
-  if (!match) {
+  if (!rawMatch) {
     return (
       <div className="container error-state">
         {t('match.notFound')}{' '}
-        <Link to="/today">{t('common.backToMatches')}</Link>
+        <Link to="/">{t('common.backToMatches')}</Link>
       </div>
     );
   }
 
-  const home = getTeamById(teams, match.homeTeamId);
-  const away = getTeamById(teams, match.awayTeamId);
+  const { homeTeamId, awayTeamId } = resolveMatchTeams(rawMatch, teams, matches);
+  const match = { ...rawMatch, homeTeamId, awayTeamId };
+  const home = homeTeamId ? getTeamById(teams, homeTeamId) : undefined;
+  const away = awayTeamId ? getTeamById(teams, awayTeamId) : undefined;
+  const tbd = t('bracket.tbd');
+  const homeName = home?.name ?? tbd;
+  const awayName = away?.name ?? tbd;
+  const homeShort = home?.shortName ?? tbd;
+  const awayShort = away?.shortName ?? tbd;
   const stadium = stadiums.find((s) => s.id === match.stadiumId);
   const matchWeather = weather.find((w) => w.stadiumId === match.stadiumId);
   const winner = getMatchWinner(match, teams);
   const isLive = match.status === 'Live';
 
   const statusLabel = t(`match.status.${match.status}`);
-  const roundLabel =
-    match.round === 'Group Stage'
-      ? t('match.round.Group Stage')
-      : match.round ?? t('match.groupStage');
+  const roundLabel = translateMatchRound(t, match.round) || t('match.groupStage');
 
   const scoreDisplay =
     match.status === 'Scheduled'
@@ -52,7 +57,7 @@ export default function MatchDetailPage() {
   return (
     <div className="container">
       <GoogleSportsPanel
-        title={`${home?.shortName} vs ${away?.shortName}`}
+        title={`${homeShort} vs ${awayShort}`}
         subtitle={roundLabel}
       >
         <div className="g-match-hero">
@@ -67,10 +72,10 @@ export default function MatchDetailPage() {
           <div className="g-match-hero-scoreline">
             <div className="g-match-hero-team">
               <span className="g-match-hero-flag">
-                <TeamFlag team={home} size={48} />
+                {home ? <TeamFlag team={home} size={48} /> : <span className="g-bracket-tbd-icon" aria-hidden />}
               </span>
               <span className={`g-match-hero-name${winner?.id === home?.id ? ' winner' : ''}`}>
-                {home?.name}
+                {homeName}
               </span>
             </div>
 
@@ -83,10 +88,10 @@ export default function MatchDetailPage() {
 
             <div className="g-match-hero-team">
               <span className="g-match-hero-flag">
-                <TeamFlag team={away} size={48} />
+                {away ? <TeamFlag team={away} size={48} /> : <span className="g-bracket-tbd-icon" aria-hidden />}
               </span>
               <span className={`g-match-hero-name${winner?.id === away?.id ? ' winner' : ''}`}>
-                {away?.name}
+                {awayName}
               </span>
             </div>
           </div>
@@ -130,7 +135,7 @@ export default function MatchDetailPage() {
             <div className="g-info-row">
               <span className="g-info-label">{t('match.venue')}</span>
               <span className="g-info-value">
-                {stadium.name}, {stadium.city}
+                {formatStadiumLabel(stadium)}
               </span>
             </div>
           )}

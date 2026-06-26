@@ -5,6 +5,7 @@ import TeamFlag from './TeamFlag';
 import {
   formatDate,
   formatMatchTime,
+  formatStadiumLabel,
   getMatchWinner,
   getTeamById,
 } from '../utils/helpers';
@@ -67,7 +68,7 @@ export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
       <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
         <span>{formatMatchTime(match.date, match.time, match.timezone, locale)} · </span>
         {match.group && <span>{t('common.group')} {match.group} · </span>}
-        {stadium && <span>{stadium.name} · {stadium.city}</span>}
+        {stadium && <span>{formatStadiumLabel(stadium)}</span>}
       </div>
     </Link>
   );

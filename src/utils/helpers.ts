@@ -1,4 +1,4 @@
-import type { Match, Standing, Team } from '../types';
+import type { Match, Stadium, Standing, Team } from '../types';
 
 export function getTodayString(): string {
   return new Date().toISOString().slice(0, 10);
@@ -234,6 +234,16 @@ export function getMatchWinner(
   return null;
 }
 
+export function translateMatchRound(
+  t: (key: string) => string,
+  round?: string
+): string {
+  if (!round) return '';
+  const key = `match.round.${round}`;
+  const translated = t(key);
+  return translated === key ? round : translated;
+}
+
 export function countTeamMatches(teamId: string, matches: Match[]): number {
   return matches.filter(
     (m) => m.homeTeamId === teamId || m.awayTeamId === teamId
@@ -242,6 +252,13 @@ export function countTeamMatches(teamId: string, matches: Match[]): number {
 
 export function countStadiumMatches(stadiumId: string, matches: Match[]): number {
   return matches.filter((m) => m.stadiumId === stadiumId).length;
+}
+
+export function formatStadiumLabel(
+  stadium: Pick<Stadium, 'name' | 'city' | 'state' | 'country'>
+): string {
+  const place = stadium.state ? `${stadium.city}, ${stadium.state}` : stadium.city;
+  return `${stadium.name} · ${place}, ${stadium.country}`;
 }
 
 export function matchesSearchText(

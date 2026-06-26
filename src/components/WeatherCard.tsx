@@ -1,5 +1,6 @@
 import type { WeatherInfo, Stadium } from '../types';
 import { useLanguage, useT } from '../context/LanguageContext';
+import { formatStadiumLabel } from '../utils/helpers';
 
 interface WeatherCardProps {
   weather: WeatherInfo;
@@ -13,11 +14,7 @@ export default function WeatherCard({ weather, stadium }: WeatherCardProps) {
   return (
     <div className="card">
       <div style={{ fontWeight: 600, fontSize: '1.0625rem' }}>
-        {stadium?.name ?? weather.city}
-      </div>
-      <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-        {weather.city}
-        {stadium?.country && ` · ${stadium.country}`}
+        {stadium ? formatStadiumLabel(stadium) : weather.city}
       </div>
       <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
         <span style={{ fontSize: '2.5rem' }}>

@@ -1,14 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Match, Stadium, Team } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
+import { resolveMatchTeams } from '../utils/bracketHelpers';
 import {
   formatDate,
   formatMatchTime,
+  formatStadiumLabel,
   getMatchWinner,
   getTeamById,
-  shouldExpandMatchDay,
+  translateMatchRound,
 } from '../utils/helpers';
 
 interface GoogleMatchRowProps {
@@ -17,6 +19,16 @@ interface GoogleMatchRowProps {
   stadium?: Stadium;
   showMeta?: boolean;
   locale?: string;
+  allMatches: Match[];
+}
+
+function teamDisplayName(
+  teamId: string,
+  teams: Team[],
+  tbd: string
+): string {
+  if (!teamId) return tbd;
+  return getTeamById(teams, teamId)?.name ?? teamId;
 }
 
 export default function GoogleMatchRow({
@@ -25,22 +37,24 @@ export default function GoogleMatchRow({
   stadium,
   showMeta = true,
   locale,
+  allMatches,
 }: GoogleMatchRowProps) {
   const { locale: ctxLocale, t } = useLanguage();
   const loc = locale ?? ctxLocale;
 
-  const home = getTeamById(teams, match.homeTeamId);
-  const away = getTeamById(teams, match.awayTeamId);
-  const winner = getMatchWinner(match, teams);
+  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, teams, allMatches);
+  const displayMatch = { ...match, homeTeamId, awayTeamId };
+
+  const home = homeTeamId ? getTeamById(teams, homeTeamId) : undefined;
+  const away = awayTeamId ? getTeamById(teams, awayTeamId) : undefined;
+  const winner = getMatchWinner(displayMatch, teams);
   const isLive = match.status === 'Live';
   const isFinished = match.status === 'Finished';
   const isScheduled = match.status === 'Scheduled';
+  const tbd = t('bracket.tbd');
 
   const statusLabel = t(`match.status.${match.status}`);
-  const roundLabel =
-    match.round === 'Group Stage'
-      ? t('match.round.Group Stage')
-      : match.round;
+  const roundLabel = translateMatchRound(t, match.round);
 
   const kickoffTime = formatMatchTime(match.date, match.time, match.timezone, loc);
 
@@ -51,44 +65,43 @@ export default function GoogleMatchRow({
   return (
     <Link to={`/matches/${match.id}`} className="g-match-row g-match-row-readable">
       <div className="g-match-row-top">
-          <span className="g-match-round">
-            {roundLabel}
-            {match.group ? ` · ${t('common.group')} ${match.group}` : ''}
-          </span>
-          <span className={`g-match-status ${isLive ? 'live' : isFinished ? 'finished' : 'scheduled'}`}>
-            {isLive && <span className="g-live-dot" />}
-            {statusLabel}
-          </span>
+        <span className="g-match-round">
+          {roundLabel}
+          {match.group ? ` · ${t('common.group')} ${match.group}` : ''}
+        </span>
+        <span className={`g-match-status ${isLive ? 'live' : isFinished ? 'finished' : 'scheduled'}`}>
+          {isLive && <span className="g-live-dot" />}
+          {statusLabel}
+        </span>
+      </div>
+
+      <div className="g-match-kickoff">
+        <span className="g-match-kickoff-time">{kickoffTime}</span>
+      </div>
+
+      <div className="g-match-teams-line">
+        <span className={`g-match-team-inline home${winner?.id === home?.id ? ' winner' : ''}`}>
+          {home ? <TeamFlag team={home} size={22} /> : <span className="g-bracket-tbd-icon" aria-hidden />}
+          <span className="g-match-team-name">{teamDisplayName(homeTeamId, teams, tbd)}</span>
+        </span>
+
+        <span
+          className={`g-match-score-inline${isLive ? ' live' : ''}${isScheduled ? ' scheduled' : ''}`}
+        >
+          {scoreDisplay}
+        </span>
+
+        <span className={`g-match-team-inline away${winner?.id === away?.id ? ' winner' : ''}`}>
+          <span className="g-match-team-name">{teamDisplayName(awayTeamId, teams, tbd)}</span>
+          {away ? <TeamFlag team={away} size={22} /> : <span className="g-bracket-tbd-icon" aria-hidden />}
+        </span>
+      </div>
+
+      {showMeta && stadium && (
+        <div className="g-match-meta">
+          {formatStadiumLabel(stadium)}
         </div>
-
-        <div className="g-match-kickoff">
-          <span className="g-match-kickoff-label">{t('match.kickoff')}</span>
-          <span className="g-match-kickoff-time">{kickoffTime}</span>
-        </div>
-
-        <div className="g-match-teams-line">
-          <span className={`g-match-team-inline home${winner?.id === home?.id ? ' winner' : ''}`}>
-            <TeamFlag team={home} size={22} />
-            <span className="g-match-team-name">{home?.name ?? match.homeTeamId}</span>
-          </span>
-
-          <span
-            className={`g-match-score-inline${isLive ? ' live' : ''}${isScheduled ? ' scheduled' : ''}`}
-          >
-            {scoreDisplay}
-          </span>
-
-          <span className={`g-match-team-inline away${winner?.id === away?.id ? ' winner' : ''}`}>
-            <span className="g-match-team-name">{away?.name ?? match.awayTeamId}</span>
-            <TeamFlag team={away} size={22} />
-          </span>
-        </div>
-
-        {showMeta && stadium && (
-          <div className="g-match-meta">
-            {stadium.name} · {stadium.city}
-          </div>
-        )}
+      )}
     </Link>
   );
 }
@@ -100,6 +113,7 @@ export function GoogleMatchDateGroup({
   stadiums,
   locale,
   initialExpanded,
+  allMatches,
 }: {
   date: string;
   matches: Match[];
@@ -107,19 +121,16 @@ export function GoogleMatchDateGroup({
   stadiums: Stadium[];
   locale?: string;
   initialExpanded?: boolean;
+  allMatches: Match[];
 }) {
   const { locale: ctxLocale, t } = useLanguage();
   const loc = locale ?? ctxLocale;
 
-  const defaultExpanded = useMemo(
-    () => initialExpanded ?? shouldExpandMatchDay(matches),
-    [initialExpanded, matches]
-  );
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded] = useState(initialExpanded ?? false);
 
   useEffect(() => {
-    if (defaultExpanded) setExpanded(true);
-  }, [defaultExpanded]);
+    setExpanded(initialExpanded ?? false);
+  }, [initialExpanded, date]);
 
   const liveCount = matches.filter((m) => m.status === 'Live').length;
 
@@ -157,6 +168,7 @@ export function GoogleMatchDateGroup({
               teams={teams}
               stadium={stadium}
               locale={loc}
+              allMatches={allMatches}
             />
           );
         })}
@@ -169,11 +181,13 @@ export function GoogleMatchPastSection({
   teams,
   stadiums,
   locale,
+  allMatches,
 }: {
   days: [string, Match[]][];
   teams: Team[];
   stadiums: Stadium[];
   locale?: string;
+  allMatches: Match[];
 }) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
@@ -210,6 +224,7 @@ export function GoogleMatchPastSection({
             stadiums={stadiums}
             locale={locale}
             initialExpanded={false}
+            allMatches={allMatches}
           />
         ))}
     </div>

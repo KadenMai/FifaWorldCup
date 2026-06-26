@@ -166,6 +166,42 @@ export function resolveBracket(
   }));
 }
 
+function parseMatchNumber(matchId: string): number | null {
+  const num = parseInt(matchId.replace('match-', ''), 10);
+  return Number.isNaN(num) ? null : num;
+}
+
+/** Merge bracket-resolved teams into knockout rows stored with empty team IDs. */
+export function resolveMatchTeams(
+  match: Match,
+  teams: Team[],
+  allMatches: Match[]
+): { homeTeamId: string; awayTeamId: string } {
+  const hasHome = Boolean(match.homeTeamId);
+  const hasAway = Boolean(match.awayTeamId);
+  if (hasHome && hasAway) {
+    return { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId };
+  }
+
+  const matchNum = parseMatchNumber(match.id);
+  if (matchNum == null || matchNum < 73) {
+    return { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId };
+  }
+
+  const groupMatches = allMatches.filter((m) => m.round === 'Group Stage' || m.group);
+  const knockoutMatches = allMatches.filter(
+    (m) => m.round && m.round !== 'Group Stage' && !m.group
+  );
+  const resolved = resolveBracket(teams, groupMatches, knockoutMatches).find(
+    (m) => m.id === matchNum
+  );
+
+  return {
+    homeTeamId: match.homeTeamId || resolved?.homeTeamId || '',
+    awayTeamId: match.awayTeamId || resolved?.awayTeamId || '',
+  };
+}
+
 export function getBracketMatchesByRound(
   resolved: ResolvedBracketMatch[]
 ): Map<BracketRound, ResolvedBracketMatch[]> {

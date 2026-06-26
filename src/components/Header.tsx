@@ -53,12 +53,19 @@ export function BottomNav() {
   const t = useT();
 
   const navItems = [
-    { to: '/today', label: t('nav.matches'), icon: '⚽' },
+    { to: '/', label: t('nav.matches'), icon: '⚽' },
     { to: '/standings', label: t('nav.standings'), icon: '📊' },
     { to: '/teams', label: t('nav.teams'), icon: '🏳️' },
     { to: '/locations', label: t('nav.venues'), icon: '🏟️' },
     { to: '/weather', label: t('nav.weather'), icon: '🌤️' },
   ];
+
+  const isBottomNavActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname.startsWith('/matches/');
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <nav className="bottom-nav">
@@ -66,7 +73,7 @@ export function BottomNav() {
         <Link
           key={item.to}
           to={item.to}
-          className={location.pathname.startsWith(item.to) ? 'active' : ''}
+          className={isBottomNavActive(item.to) ? 'active' : ''}
         >
           <span className="bottom-nav-icon">{item.icon}</span>
           <span>{item.label}</span>

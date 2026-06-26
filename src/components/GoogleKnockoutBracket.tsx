@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import * as d3 from 'd3';
 import type { Match, Team } from '../types';
@@ -78,14 +79,16 @@ function BracketCard({
   locale: string;
   highlight?: boolean;
 }) {
+  const matchId = `match-${String(match.id).padStart(3, '0')}`;
+
   return (
-    <div className={`g-bracket-card${highlight ? ' g-bracket-card-final' : ''}`}>
+    <Link to={`/matches/${matchId}`} className={`g-bracket-card g-bracket-card-link${highlight ? ' g-bracket-card-final' : ''}`}>
       <div className="g-bracket-card-time">
         {formatMatchKickoff(match.date, match.time, match.timezone, locale)}
       </div>
       <BracketTeamRow teamId={match.homeTeamId} teams={teams} tbd={tbd} />
       <BracketTeamRow teamId={match.awayTeamId} teams={teams} tbd={tbd} />
-    </div>
+    </Link>
   );
 }
 
