@@ -366,6 +366,16 @@ a {
   box-shadow: inset 3px 0 0 var(--google-blue);
 }
 
+.g-knockout-crown {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.g-knockout-crown-legend {
+  margin-right: 2px;
+}
+
 .g-col-rank {
   width: 28px;
   text-align: center;
@@ -395,7 +405,7 @@ a {
 }
 
 .g-col-form {
-  width: 88px;
+  width: 56px;
   text-align: left;
   padding-right: 10px !important;
 }

@@ -3,7 +3,7 @@ import type { Match, Standing, Team } from '../types';
 import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
-import type { TeamFormData } from '../utils/standingsHelpers';
+import { FORM_MATCH_COUNT, type TeamFormData } from '../utils/standingsHelpers';
 import { getMergedGroupStandings, getTeamById } from '../utils/helpers';
 
 interface GoogleGroupTableProps {
@@ -12,11 +12,12 @@ interface GoogleGroupTableProps {
   teams: Team[];
   matches: Match[];
   formMap: Map<string, TeamFormData>;
+  confirmedKnockout: Set<string>;
 }
 
-function FormDots({ form }: { form: (string | null)[] }) {
+function FormDots({ form, label }: { form: (string | null)[]; label: string }) {
   return (
-    <div className="g-form-dots" aria-label="Last 5 matches">
+    <div className="g-form-dots" aria-label={label}>
       {form.map((r, i) => (
         <span
           key={i}
@@ -38,6 +39,7 @@ export default function GoogleGroupTable({
   teams,
   matches,
   formMap,
+  confirmedKnockout,
 }: GoogleGroupTableProps) {
   const t = useT();
   const editionPath = useEditionPath();
@@ -62,20 +64,29 @@ export default function GoogleGroupTable({
               <th className="g-col-num">{t('standings.lost')}</th>
               <th className="g-col-num">{t('standings.gd')}</th>
               <th className="g-col-pts">{t('standings.pts')}</th>
-              <th className="g-col-form">{t('standings.last5')}</th>
+              <th className="g-col-form">{t('standings.results')}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, idx) => {
               const team = getTeamById(teams, row.teamId);
               const form = formMap.get(row.teamId);
-              const qualified = idx < 2;
+              const isConfirmed = confirmedKnockout.has(row.teamId);
 
               return (
-                <tr key={row.teamId} className={qualified ? 'g-row-qualified' : ''}>
+                <tr key={row.teamId} className={isConfirmed ? 'g-row-qualified' : ''}>
                   <td className="g-col-rank">{idx + 1}</td>
                   <td className="g-col-team">
                     <Link to={editionPath(`/teams/${row.teamId}`)} className="g-team-link">
+                      {isConfirmed && (
+                        <span
+                          className="g-knockout-crown"
+                          title={t('standings.knockoutConfirmed')}
+                          aria-label={t('standings.knockoutConfirmed')}
+                        >
+                          👑
+                        </span>
+                      )}
                       <TeamFlag team={team} size={20} />
                       <span>{team?.name ?? row.teamId}</span>
                     </Link>
@@ -88,7 +99,10 @@ export default function GoogleGroupTable({
                   </td>
                   <td className="g-col-pts"><strong>{row.points}</strong></td>
                   <td className="g-col-form">
-                    <FormDots form={form?.form ?? Array(5).fill(null)} />
+                    <FormDots
+                      form={form?.form ?? Array(FORM_MATCH_COUNT).fill(null)}
+                      label={t('standings.results')}
+                    />
                   </td>
                 </tr>
               );

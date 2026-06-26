@@ -1,5 +1,8 @@
 import type { Match, Team } from '../types';
+import { thirdGroupForWinner } from './annexCLookup';
 import { computeStandingsFromMatches, sortStandings } from './helpers';
+import { qualifyingThirdPlaceGroups } from './thirdPlaceRanking';
+import { getCompletedGroups } from './groupStageHelpers';
 
 export type BracketRound = 'r32' | 'r16' | 'qf' | 'sf' | 'third' | 'final';
 
@@ -7,7 +10,7 @@ export type BracketSlot =
   | { kind: 'team'; teamId: string }
   | { kind: 'winner'; group: string }
   | { kind: 'runner-up'; group: string }
-  | { kind: 'third'; groups: string[] }
+  | { kind: 'third'; winnerGroup: string }
   | { kind: 'winner-of'; matchId: number }
   | { kind: 'loser-of'; matchId: number };
 
@@ -33,20 +36,20 @@ export interface ResolvedBracketMatch {
 
 const KNOCKOUT_FIXTURES: BracketFixture[] = [
   { id: 73, round: 'r32', date: '2026-06-28', time: '12:00', timezone: 'America/Los_Angeles', home: { kind: 'runner-up', group: 'A' }, away: { kind: 'runner-up', group: 'B' } },
-  { id: 74, round: 'r32', date: '2026-06-29', time: '16:30', timezone: 'America/New_York', home: { kind: 'winner', group: 'E' }, away: { kind: 'third', groups: ['A', 'B', 'C', 'D', 'F'] } },
+  { id: 74, round: 'r32', date: '2026-06-29', time: '16:30', timezone: 'America/New_York', home: { kind: 'winner', group: 'E' }, away: { kind: 'third', winnerGroup: 'E' } },
   { id: 75, round: 'r32', date: '2026-06-30', time: '21:00', timezone: 'America/Chicago', home: { kind: 'winner', group: 'F' }, away: { kind: 'runner-up', group: 'C' } },
   { id: 76, round: 'r32', date: '2026-06-29', time: '13:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'C' }, away: { kind: 'runner-up', group: 'F' } },
-  { id: 77, round: 'r32', date: '2026-06-30', time: '17:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'I' }, away: { kind: 'third', groups: ['C', 'D', 'F', 'G', 'H'] } },
+  { id: 77, round: 'r32', date: '2026-06-30', time: '17:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'I' }, away: { kind: 'third', winnerGroup: 'I' } },
   { id: 78, round: 'r32', date: '2026-06-30', time: '13:00', timezone: 'America/Los_Angeles', home: { kind: 'runner-up', group: 'E' }, away: { kind: 'runner-up', group: 'I' } },
-  { id: 79, round: 'r32', date: '2026-06-30', time: '21:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'A' }, away: { kind: 'third', groups: ['C', 'E', 'F', 'H', 'I'] } },
-  { id: 80, round: 'r32', date: '2026-07-01', time: '18:00', timezone: 'America/New_York', home: { kind: 'winner', group: 'L' }, away: { kind: 'third', groups: ['E', 'H', 'I', 'J', 'K'] } },
-  { id: 81, round: 'r32', date: '2026-07-01', time: '20:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'D' }, away: { kind: 'third', groups: ['B', 'E', 'F', 'I', 'J'] } },
-  { id: 82, round: 'r32', date: '2026-07-01', time: '13:00', timezone: 'America/New_York', home: { kind: 'winner', group: 'G' }, away: { kind: 'third', groups: ['A', 'E', 'H', 'I', 'J'] } },
+  { id: 79, round: 'r32', date: '2026-06-30', time: '21:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'A' }, away: { kind: 'third', winnerGroup: 'A' } },
+  { id: 80, round: 'r32', date: '2026-07-01', time: '18:00', timezone: 'America/New_York', home: { kind: 'winner', group: 'L' }, away: { kind: 'third', winnerGroup: 'L' } },
+  { id: 81, round: 'r32', date: '2026-07-01', time: '20:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'D' }, away: { kind: 'third', winnerGroup: 'D' } },
+  { id: 82, round: 'r32', date: '2026-07-01', time: '13:00', timezone: 'America/New_York', home: { kind: 'winner', group: 'G' }, away: { kind: 'third', winnerGroup: 'G' } },
   { id: 83, round: 'r32', date: '2026-07-02', time: '13:00', timezone: 'America/New_York', home: { kind: 'runner-up', group: 'K' }, away: { kind: 'runner-up', group: 'L' } },
   { id: 84, round: 'r32', date: '2026-07-02', time: '15:00', timezone: 'America/Los_Angeles', home: { kind: 'winner', group: 'H' }, away: { kind: 'runner-up', group: 'J' } },
-  { id: 85, round: 'r32', date: '2026-07-02', time: '20:00', timezone: 'America/Chicago', home: { kind: 'winner', group: 'B' }, away: { kind: 'third', groups: ['E', 'F', 'G', 'I', 'J'] } },
+  { id: 85, round: 'r32', date: '2026-07-02', time: '20:00', timezone: 'America/Chicago', home: { kind: 'winner', group: 'B' }, away: { kind: 'third', winnerGroup: 'B' } },
   { id: 86, round: 'r32', date: '2026-07-03', time: '18:00', timezone: 'America/New_York', home: { kind: 'winner', group: 'J' }, away: { kind: 'runner-up', group: 'H' } },
-  { id: 87, round: 'r32', date: '2026-07-03', time: '21:30', timezone: 'America/Chicago', home: { kind: 'winner', group: 'K' }, away: { kind: 'third', groups: ['D', 'E', 'I', 'J', 'L'] } },
+  { id: 87, round: 'r32', date: '2026-07-03', time: '21:30', timezone: 'America/Chicago', home: { kind: 'winner', group: 'K' }, away: { kind: 'third', winnerGroup: 'K' } },
   { id: 88, round: 'r32', date: '2026-07-03', time: '13:00', timezone: 'America/Los_Angeles', home: { kind: 'runner-up', group: 'D' }, away: { kind: 'runner-up', group: 'G' } },
   { id: 89, round: 'r16', date: '2026-07-04', time: '17:00', timezone: 'America/Chicago', home: { kind: 'winner-of', matchId: 74 }, away: { kind: 'winner-of', matchId: 77 } },
   { id: 90, round: 'r16', date: '2026-07-04', time: '13:00', timezone: 'America/Los_Angeles', home: { kind: 'winner-of', matchId: 73 }, away: { kind: 'winner-of', matchId: 75 } },
@@ -57,8 +60,8 @@ const KNOCKOUT_FIXTURES: BracketFixture[] = [
   { id: 95, round: 'r16', date: '2026-07-07', time: '12:00', timezone: 'America/New_York', home: { kind: 'winner-of', matchId: 86 }, away: { kind: 'winner-of', matchId: 88 } },
   { id: 96, round: 'r16', date: '2026-07-07', time: '16:00', timezone: 'America/New_York', home: { kind: 'winner-of', matchId: 85 }, away: { kind: 'winner-of', matchId: 87 } },
   { id: 97, round: 'qf', date: '2026-07-09', time: '20:00', timezone: 'America/New_York', home: { kind: 'winner-of', matchId: 89 }, away: { kind: 'winner-of', matchId: 90 } },
-  { id: 98, round: 'qf', date: '2026-07-10', time: '20:00', timezone: 'America/Los_Angeles', home: { kind: 'winner-of', matchId: 91 }, away: { kind: 'winner-of', matchId: 92 } },
-  { id: 99, round: 'qf', date: '2026-07-11', time: '15:00', timezone: 'America/New_York', home: { kind: 'winner-of', matchId: 93 }, away: { kind: 'winner-of', matchId: 94 } },
+  { id: 98, round: 'qf', date: '2026-07-10', time: '20:00', timezone: 'America/Los_Angeles', home: { kind: 'winner-of', matchId: 93 }, away: { kind: 'winner-of', matchId: 94 } },
+  { id: 99, round: 'qf', date: '2026-07-11', time: '15:00', timezone: 'America/New_York', home: { kind: 'winner-of', matchId: 91 }, away: { kind: 'winner-of', matchId: 92 } },
   { id: 100, round: 'qf', date: '2026-07-11', time: '18:00', timezone: 'America/Chicago', home: { kind: 'winner-of', matchId: 95 }, away: { kind: 'winner-of', matchId: 96 } },
   { id: 101, round: 'sf', date: '2026-07-14', time: '20:00', timezone: 'America/Chicago', home: { kind: 'winner-of', matchId: 97 }, away: { kind: 'winner-of', matchId: 98 } },
   { id: 102, round: 'sf', date: '2026-07-15', time: '19:00', timezone: 'America/New_York', home: { kind: 'winner-of', matchId: 99 }, away: { kind: 'winner-of', matchId: 100 } },
@@ -72,6 +75,10 @@ export const BRACKET_ROUNDS: BracketRound[] = ['r32', 'r16', 'qf', 'sf', 'third'
 export const BRACKET_TREE_ROUNDS: BracketRound[] = ['r32', 'r16', 'qf', 'sf', 'final'];
 
 const SF_TREE_INDEX = 3;
+
+function formatMatchId(matchNum: number): string {
+  return `match-${String(matchNum).padStart(3, '0')}`;
+}
 
 function groupPlacements(teams: Team[], matches: Match[]): Map<string, string[]> {
   const standings = computeStandingsFromMatches(teams, matches);
@@ -96,17 +103,25 @@ function resolveSlot(
   slot: BracketSlot,
   placements: Map<string, string[]>,
   knockoutResults: Map<number, string>,
-  knockoutLosers: Map<number, string>
+  knockoutLosers: Map<number, string>,
+  qualifyingThirdGroups: string[],
+  completedGroups: Set<string>,
 ): string | null {
   switch (slot.kind) {
     case 'team':
       return slot.teamId;
     case 'winner':
+      if (!completedGroups.has(slot.group)) return null;
       return placements.get(slot.group)?.[0] ?? null;
     case 'runner-up':
+      if (!completedGroups.has(slot.group)) return null;
       return placements.get(slot.group)?.[1] ?? null;
-    case 'third':
-      return null;
+    case 'third': {
+      if (qualifyingThirdGroups.length < 8) return null;
+      const sourceGroup = thirdGroupForWinner(qualifyingThirdGroups, slot.winnerGroup);
+      if (!sourceGroup || !completedGroups.has(sourceGroup)) return null;
+      return placements.get(sourceGroup)?.[2] ?? null;
+    }
     case 'winner-of':
       return knockoutResults.get(slot.matchId) ?? null;
     case 'loser-of':
@@ -117,23 +132,31 @@ function resolveSlot(
 }
 
 function getKnockoutWinner(matchId: number, matches: Match[]): string | null {
-  const data = matches.find((m) => m.id === `match-${matchId}`);
+  const data = matches.find((m) => m.id === formatMatchId(matchId));
   if (!data || data.status !== 'Finished' || data.homeScore == null || data.awayScore == null) {
     return null;
   }
   if (data.homeScore > data.awayScore) return data.homeTeamId;
   if (data.awayScore > data.homeScore) return data.awayTeamId;
+  // Penalty shootout winner stored in notes, e.g. "Pens: home" or team id
+  const notes = data.notes?.toLowerCase() ?? '';
+  if (notes.includes('pen') && notes.includes('home')) return data.homeTeamId;
+  if (notes.includes('pen') && notes.includes('away')) return data.awayTeamId;
+  if (notes.startsWith('winner:')) {
+    const winnerId = data.notes!.slice('winner:'.length).trim();
+    if (winnerId === data.homeTeamId || winnerId === data.awayTeamId) return winnerId;
+  }
   return null;
 }
 
 function getKnockoutLoser(matchId: number, matches: Match[]): string | null {
-  const data = matches.find((m) => m.id === `match-${matchId}`);
+  const data = matches.find((m) => m.id === formatMatchId(matchId));
   if (!data || data.status !== 'Finished' || data.homeScore == null || data.awayScore == null) {
     return null;
   }
-  if (data.homeScore > data.awayScore) return data.awayTeamId;
-  if (data.awayScore > data.homeScore) return data.homeTeamId;
-  return null;
+  const winner = getKnockoutWinner(matchId, matches);
+  if (!winner) return null;
+  return winner === data.homeTeamId ? data.awayTeamId : data.homeTeamId;
 }
 
 export function resolveBracket(
@@ -142,6 +165,8 @@ export function resolveBracket(
   knockoutMatches: Match[] = []
 ): ResolvedBracketMatch[] {
   const placements = groupPlacements(teams, groupMatches);
+  const completedGroups = getCompletedGroups(teams, groupMatches);
+  const qualifyingThirdGroups = qualifyingThirdPlaceGroups(teams, groupMatches);
   const knockoutResults = new Map<number, string>();
   const knockoutLosers = new Map<number, string>();
 
@@ -153,7 +178,7 @@ export function resolveBracket(
   }
 
   const resolve = (slot: BracketSlot) =>
-    resolveSlot(slot, placements, knockoutResults, knockoutLosers);
+    resolveSlot(slot, placements, knockoutResults, knockoutLosers, qualifyingThirdGroups, completedGroups);
 
   return KNOCKOUT_FIXTURES.map((fixture) => ({
     id: fixture.id,
@@ -266,40 +291,19 @@ export function getMatchCenterY(top: number, cardHeight: number): number {
   return top + cardHeight / 2;
 }
 
-/** Which matches connect to which in the bracket tree. */
+/** Which matches connect to which in the bracket tree (from official winner-of links). */
 export function getBracketConnectors(
-  byRound: Map<BracketRound, ResolvedBracketMatch[]>
+  _byRound?: Map<BracketRound, ResolvedBracketMatch[]>
 ): Array<{ sources: number[]; target: number }> {
   const connectors: Array<{ sources: number[]; target: number }> = [];
 
-  for (let r = 0; r < BRACKET_TREE_ROUNDS.length - 1; r++) {
-    const currentRound = BRACKET_TREE_ROUNDS[r];
-    const nextRound = BRACKET_TREE_ROUNDS[r + 1];
-    const current = byRound.get(currentRound) ?? [];
-    const next = byRound.get(nextRound) ?? [];
-
-    if (currentRound === 'sf' && nextRound === 'final') {
-      if (current.length >= 2 && next.length >= 1) {
-        connectors.push({ sources: [current[0].id, current[1].id], target: next[0].id });
-      }
-      continue;
+  for (const fixture of KNOCKOUT_FIXTURES) {
+    const sources: number[] = [];
+    if (fixture.home.kind === 'winner-of') sources.push(fixture.home.matchId);
+    if (fixture.away.kind === 'winner-of') sources.push(fixture.away.matchId);
+    if (sources.length === 2) {
+      connectors.push({ sources, target: fixture.id });
     }
-
-    for (let i = 0; i < current.length; i += 2) {
-      const parentIdx = i / 2;
-      if (i + 1 < current.length && parentIdx < next.length) {
-        connectors.push({
-          sources: [current[i].id, current[i + 1].id],
-          target: next[parentIdx].id,
-        });
-      }
-    }
-  }
-
-  const third = byRound.get('third')?.[0];
-  const sf = byRound.get('sf') ?? [];
-  if (third && sf.length >= 2) {
-    connectors.push({ sources: [sf[0].id, sf[1].id], target: third.id });
   }
 
   return connectors;

@@ -1,5 +1,7 @@
 import type { Match } from '../types';
 
+export const FORM_MATCH_COUNT = 3;
+
 export type FormResult = 'W' | 'D' | 'L';
 
 export interface TeamLastResult {
@@ -35,8 +37,8 @@ export function getTeamFormFromMatches(teamId: string, matches: Match[]): TeamFo
     return 'D';
   });
 
-  const form: (FormResult | null)[] = Array(5).fill(null);
-  const recent = results.slice(-5);
+  const form: (FormResult | null)[] = Array(FORM_MATCH_COUNT).fill(null);
+  const recent = results.slice(-FORM_MATCH_COUNT);
   recent.forEach((r, i) => {
     form[i] = r;
   });
