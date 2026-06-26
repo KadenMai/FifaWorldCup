@@ -386,25 +386,25 @@
   {
     "group": "I",
     "teamId": "france",
-    "played": 2,
-    "won": 2,
+    "played": 3,
+    "won": 3,
     "drawn": 0,
     "lost": 0,
-    "goalsFor": 6,
-    "goalsAgainst": 1,
-    "goalDifference": 5,
-    "points": 6
+    "goalsFor": 10,
+    "goalsAgainst": 2,
+    "goalDifference": 8,
+    "points": 9
   },
   {
     "group": "I",
     "teamId": "norway",
-    "played": 2,
+    "played": 3,
     "won": 2,
     "drawn": 0,
-    "lost": 0,
-    "goalsFor": 7,
-    "goalsAgainst": 3,
-    "goalDifference": 4,
+    "lost": 1,
+    "goalsFor": 8,
+    "goalsAgainst": 7,
+    "goalDifference": 1,
     "points": 6
   },
   {
