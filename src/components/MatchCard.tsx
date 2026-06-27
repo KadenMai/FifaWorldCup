@@ -3,6 +3,7 @@ import type { Match, Stadium, Team } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useEditionPath } from '../context/EditionContext';
 import TeamFlag from './TeamFlag';
+import { resolveMatchTeams } from '../utils/bracketHelpers';
 import {
   formatDate,
   formatMatchTime,
@@ -14,23 +15,28 @@ import {
 interface MatchCardProps {
   match: Match;
   teams: Team[];
+  allMatches?: Match[];
   stadium?: Stadium;
 }
 
-export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
+export default function MatchCard({ match, teams, allMatches, stadium }: MatchCardProps) {
   const { locale, t } = useLanguage();
   const editionPath = useEditionPath();
-  const home = getTeamById(teams, match.homeTeamId);
-  const away = getTeamById(teams, match.awayTeamId);
-  const winner = getMatchWinner(match, teams);
-  const homeScore = match.homeScore ?? '-';
-  const awayScore = match.awayScore ?? '-';
-  const statusLabel = t(`match.status.${match.status}`);
+  const { homeTeamId, awayTeamId } = allMatches
+    ? resolveMatchTeams(match, teams, allMatches)
+    : { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId };
+  const displayMatch = { ...match, homeTeamId, awayTeamId };
+  const home = getTeamById(teams, homeTeamId);
+  const away = getTeamById(teams, awayTeamId);
+  const winner = getMatchWinner(displayMatch, teams);
+  const homeScore = displayMatch.homeScore ?? '-';
+  const awayScore = displayMatch.awayScore ?? '-';
+  const statusLabel = t(`match.status.${displayMatch.status}`);
 
   const statusClass =
-    match.status === 'Live'
+    displayMatch.status === 'Live'
       ? 'badge-live'
-      : match.status === 'Finished'
+      : displayMatch.status === 'Finished'
         ? 'badge-finished'
         : 'badge-scheduled';
 
@@ -39,7 +45,7 @@ export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <span className={`badge ${statusClass}`}>{statusLabel}</span>
         <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          {formatDate(match.date, locale)}
+          {formatDate(displayMatch.date, locale)}
         </span>
       </div>
 
@@ -47,13 +53,13 @@ export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
         <div style={{ flex: 1, textAlign: 'right' }}>
           <TeamFlag team={home} size={32} />
           <div style={{ fontWeight: winner?.id === home?.id ? 700 : 500, marginTop: 4 }}>
-            {home?.shortName ?? match.homeTeamId}
+            {home?.shortName ?? homeTeamId}
           </div>
         </div>
         <div style={{
-          fontSize: match.status === 'Live' ? '1.75rem' : '1.5rem',
+          fontSize: displayMatch.status === 'Live' ? '1.75rem' : '1.5rem',
           fontWeight: 700,
-          color: match.status === 'Live' ? 'var(--color-live)' : 'inherit',
+          color: displayMatch.status === 'Live' ? 'var(--color-live)' : 'inherit',
           minWidth: 80,
           textAlign: 'center',
         }}>
@@ -62,14 +68,14 @@ export default function MatchCard({ match, teams, stadium }: MatchCardProps) {
         <div style={{ flex: 1, textAlign: 'left' }}>
           <TeamFlag team={away} size={32} />
           <div style={{ fontWeight: winner?.id === away?.id ? 700 : 500, marginTop: 4 }}>
-            {away?.shortName ?? match.awayTeamId}
+            {away?.shortName ?? awayTeamId}
           </div>
         </div>
       </div>
 
       <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-        <span>{formatMatchTime(match.date, match.time, match.timezone, locale)} · </span>
-        {match.group && <span>{t('common.group')} {match.group} · </span>}
+        <span>{formatMatchTime(displayMatch.date, displayMatch.time, displayMatch.timezone, locale)} · </span>
+        {displayMatch.group && <span>{t('common.group')} {displayMatch.group} · </span>}
         {stadium && <span>{formatStadiumLabel(stadium)}</span>}
       </div>
     </Link>

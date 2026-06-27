@@ -7,6 +7,7 @@ import PlayerCard from '../components/PlayerCard';
 import StandingsTable from '../components/StandingsTable';
 import { ErrorState, LoadingState } from '../components/PageState';
 import TeamFlag from '../components/TeamFlag';
+import { getMatchesForTeam } from '../utils/bracketHelpers';
 import { getTeamById } from '../utils/helpers';
 
 export default function TeamDetailPage() {
@@ -32,9 +33,7 @@ export default function TeamDetailPage() {
 
   const coach = coaches.find((c) => c.id === team.coachId);
   const teamPlayers = players.filter((p) => p.teamId === team.id);
-  const teamMatches = matches.filter(
-    (m) => m.homeTeamId === team.id || m.awayTeamId === team.id
-  );
+  const teamMatches = getMatchesForTeam(team.id, teams, matches);
   const teamStanding = standings.filter(
     (s) => s.teamId === team.id && s.group === team.group
   );
@@ -89,7 +88,7 @@ export default function TeamDetailPage() {
             {teamMatches.map((match) => {
               const stadium = stadiums.find((s) => s.id === match.stadiumId);
               return (
-                <MatchCard key={match.id} match={match} teams={teams} stadium={stadium} />
+                <MatchCard key={match.id} match={match} teams={teams} allMatches={matches} stadium={stadium} />
               );
             })}
           </div>

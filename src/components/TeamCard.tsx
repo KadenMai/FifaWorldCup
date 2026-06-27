@@ -3,16 +3,17 @@ import type { Coach, Match, Team } from '../types';
 import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
-import { countTeamMatches } from '../utils/helpers';
+import { countResolvedTeamMatches } from '../utils/bracketHelpers';
 
 interface TeamCardProps {
   team: Team;
+  teams: Team[];
   coach?: Coach;
   matches: Match[];
 }
 
-export default function TeamCard({ team, coach, matches }: TeamCardProps) {
-  const matchCount = countTeamMatches(team.id, matches);
+export default function TeamCard({ team, teams, coach, matches }: TeamCardProps) {
+  const matchCount = countResolvedTeamMatches(team.id, teams, matches);
   const t = useT();
   const editionPath = useEditionPath();
 

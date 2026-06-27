@@ -227,6 +227,18 @@ export function resolveMatchTeams(
   };
 }
 
+/** All matches a team plays in (group + resolved knockout slots). */
+export function getMatchesForTeam(teamId: string, teams: Team[], matches: Match[]): Match[] {
+  return matches.filter((match) => {
+    const { homeTeamId, awayTeamId } = resolveMatchTeams(match, teams, matches);
+    return homeTeamId === teamId || awayTeamId === teamId;
+  });
+}
+
+export function countResolvedTeamMatches(teamId: string, teams: Team[], matches: Match[]): number {
+  return getMatchesForTeam(teamId, teams, matches).length;
+}
+
 export function getBracketMatchesByRound(
   resolved: ResolvedBracketMatch[]
 ): Map<BracketRound, ResolvedBracketMatch[]> {

@@ -58,7 +58,7 @@ export default function TeamsPage() {
         {filtered.map((team) => {
           const coach = coaches.find((c) => c.id === team.coachId);
           return (
-            <TeamCard key={team.id} team={team} coach={coach} matches={matches} />
+            <TeamCard key={team.id} team={team} teams={teams} coach={coach} matches={matches} />
           );
         })}
       </div>
