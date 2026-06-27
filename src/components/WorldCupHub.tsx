@@ -5,7 +5,7 @@ import { useLanguage, useT } from '../context/LanguageContext';
 import GoogleSportsPanel from './GoogleSportsPanel';
 import GoogleTabBar from './GoogleTabBar';
 import GoogleStandings from './GoogleStandings';
-import { GoogleMatchDateGroup, GoogleMatchPastSection } from './GoogleMatchRow';
+import { GoogleMatchDateGroup, GoogleMatchPastSection, GoogleMatchUpcomingSection } from './GoogleMatchRow';
 import LiveScoresStrip from './LiveScoresStrip';
 import KnockoutBracket from './d3/KnockoutBracket';
 import { getTodayString, getGroupsFromTeams, isMatchDayStillActive } from '../utils/helpers';
@@ -50,7 +50,7 @@ export default function WorldCupHub({
     });
   }, [matches, matchesFilter]);
 
-  const { activeDays, futureDays, pastDays } = useMemo(() => {
+  const { todayDays, ongoingDays, futureDays, pastDays } = useMemo(() => {
     const today = getTodayString();
     const todayList: [string, Match[]][] = [];
     const future: [string, Match[]][] = [];
@@ -66,7 +66,6 @@ export default function WorldCupHub({
     for (const [date, dateMatches] of map.entries()) {
       const stillActive = isMatchDayStillActive(dateMatches);
       if (stillActive) {
-        // Keep in-progress days visible even if calendar date is "yesterday" (UTC vs local).
         todayList.push([date, dateMatches]);
       } else if (date === today) {
         todayList.push([date, dateMatches]);
@@ -81,7 +80,12 @@ export default function WorldCupHub({
     future.sort(([a], [b]) => a.localeCompare(b));
     past.sort(([a], [b]) => b.localeCompare(a));
 
-    return { activeDays: todayList, futureDays: future, pastDays: past };
+    return {
+      todayDays: todayList.filter(([date]) => date === today),
+      ongoingDays: todayList.filter(([date]) => date !== today),
+      futureDays: future,
+      pastDays: past,
+    };
   }, [displayMatches]);
 
   const liveCount = matches.filter((m) => m.status === 'Live').length;
@@ -107,7 +111,7 @@ export default function WorldCupHub({
             </p>
           ) : (
             <>
-              {activeDays.map(([date, dateMatches]) => (
+              {todayDays.map(([date, dateMatches]) => (
                 <GoogleMatchDateGroup
                   key={date}
                   date={date}
@@ -119,7 +123,7 @@ export default function WorldCupHub({
                   allMatches={matches}
                 />
               ))}
-              {futureDays.map(([date, dateMatches]) => (
+              {ongoingDays.map(([date, dateMatches]) => (
                 <GoogleMatchDateGroup
                   key={date}
                   date={date}
@@ -131,6 +135,13 @@ export default function WorldCupHub({
                   allMatches={matches}
                 />
               ))}
+              <GoogleMatchUpcomingSection
+                days={futureDays}
+                teams={teams}
+                stadiums={stadiums}
+                locale={locale}
+                allMatches={matches}
+              />
               <GoogleMatchPastSection
                 days={pastDays}
                 teams={teams}

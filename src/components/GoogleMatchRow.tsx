@@ -192,6 +192,60 @@ export function GoogleMatchPastSection({
   allMatches: Match[];
 }) {
   const { t } = useLanguage();
+  return (
+    <GoogleMatchDaysSection
+      title={t('match.playedSection')}
+      days={days}
+      teams={teams}
+      stadiums={stadiums}
+      locale={locale}
+      allMatches={allMatches}
+    />
+  );
+}
+
+export function GoogleMatchUpcomingSection({
+  days,
+  teams,
+  stadiums,
+  locale,
+  allMatches,
+}: {
+  days: [string, Match[]][];
+  teams: Team[];
+  stadiums: Stadium[];
+  locale?: string;
+  allMatches: Match[];
+}) {
+  const { t } = useLanguage();
+  return (
+    <GoogleMatchDaysSection
+      title={t('match.upcomingSection')}
+      days={days}
+      teams={teams}
+      stadiums={stadiums}
+      locale={locale}
+      allMatches={allMatches}
+    />
+  );
+}
+
+function GoogleMatchDaysSection({
+  title,
+  days,
+  teams,
+  stadiums,
+  locale,
+  allMatches,
+}: {
+  title: string;
+  days: [string, Match[]][];
+  teams: Team[];
+  stadiums: Stadium[];
+  locale?: string;
+  allMatches: Match[];
+}) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
 
   if (days.length === 0) return null;
@@ -206,7 +260,7 @@ export function GoogleMatchPastSection({
         onClick={() => setExpanded((open) => !open)}
         aria-expanded={expanded}
       >
-        <span className="g-match-past-title">{t('match.playedSection')}</span>
+        <span className="g-match-past-title">{title}</span>
         {!expanded && (
           <span className="g-match-date-summary">
             {t('match.todayCount', { count: matchCount })}
