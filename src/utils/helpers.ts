@@ -1,7 +1,16 @@
 import type { Match, Stadium, Standing, Team } from '../types';
 
 export function getTodayString(): string {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** True when a match day still has games not yet finished (Scheduled or Live). */
+export function isMatchDayStillActive(matches: Match[]): boolean {
+  return matches.some((m) => m.status === 'Scheduled' || m.status === 'Live');
 }
 
 /** Expand match-day section when any game is live or not yet finished. */

@@ -8,7 +8,7 @@ import GoogleStandings from './GoogleStandings';
 import { GoogleMatchDateGroup, GoogleMatchPastSection } from './GoogleMatchRow';
 import LiveScoresStrip from './LiveScoresStrip';
 import KnockoutBracket from './d3/KnockoutBracket';
-import { getTodayString, getGroupsFromTeams } from '../utils/helpers';
+import { getTodayString, getGroupsFromTeams, isMatchDayStillActive } from '../utils/helpers';
 
 interface WorldCupHubProps {
   data: AppData;
@@ -64,9 +64,17 @@ export default function WorldCupHub({
     });
 
     for (const [date, dateMatches] of map.entries()) {
-      if (date === today) todayList.push([date, dateMatches]);
-      else if (date > today) future.push([date, dateMatches]);
-      else past.push([date, dateMatches]);
+      const stillActive = isMatchDayStillActive(dateMatches);
+      if (stillActive) {
+        // Keep in-progress days visible even if calendar date is "yesterday" (UTC vs local).
+        todayList.push([date, dateMatches]);
+      } else if (date === today) {
+        todayList.push([date, dateMatches]);
+      } else if (date > today) {
+        future.push([date, dateMatches]);
+      } else {
+        past.push([date, dateMatches]);
+      }
     }
 
     todayList.sort(([a], [b]) => a.localeCompare(b));
