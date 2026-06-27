@@ -44,7 +44,7 @@ export default function MatchDetailPage() {
   const homeShort = home?.shortName ?? tbd;
   const awayShort = away?.shortName ?? tbd;
   const stadium = stadiums.find((s) => s.id === match.stadiumId);
-  const matchWeather = weather.find((w) => w.stadiumId === match.stadiumId);
+  const kickoffWeather = weather.matches[match.id];
   const winner = getMatchWinner(match, teams);
   const isLive = match.status === 'Live';
 
@@ -159,9 +159,21 @@ export default function MatchDetailPage() {
         </p>
       </div>
 
-      {matchWeather && stadium && (
+      {kickoffWeather && stadium && (
         <div style={{ marginTop: 16 }}>
-          <WeatherCard weather={matchWeather} stadium={stadium} />
+          <WeatherCard
+            weather={{
+              stadiumId: stadium.id,
+              city: stadium.city,
+              temperatureF: kickoffWeather.temperatureF,
+              condition: kickoffWeather.condition,
+              wind: kickoffWeather.wind,
+              updatedAt: kickoffWeather.atKickoff ?? kickoffWeather.fetchedAt,
+            }}
+            stadium={stadium}
+            title={t('match.weatherAtKickoff')}
+            updatedLabel={t('match.kickoff')}
+          />
         </div>
       )}
 

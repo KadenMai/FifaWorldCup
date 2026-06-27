@@ -1,0 +1,13 @@
+name = "fifaworldcup-weather-cron"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+[[r2_buckets]]
+binding = "DATA_BUCKET"
+bucket_name = "fifaworldcup-data"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+DEFAULT_EDITION = "2026"

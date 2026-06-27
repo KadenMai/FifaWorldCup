@@ -5,7 +5,9 @@ export function editionDataPaths(edition: string) {
     matches: `${base}/matches.json`,
     standings: `${base}/standings.json`,
     teams: `${base}/teams.json`,
+    stadiums: `${base}/stadiums.json`,
     meta: `${base}/meta.json`,
+    weather: `${base}/weather.json`,
   };
 }
 

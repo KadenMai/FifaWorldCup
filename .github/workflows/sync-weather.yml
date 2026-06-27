@@ -1,0 +1,52 @@
+name: Sync Open-Meteo weather
+
+on:
+  schedule:
+    # Optional git backup every 30 min. Production R2 sync uses the weather-cron Worker.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-weather
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync-r2:
+    runs-on: ubuntu-latest
+    if: vars.WEATHER_SYNC_URL != ''
+    steps:
+      - name: Sync weather to R2 via Pages API
+        run: |
+          curl -fsS -X POST "${{ vars.WEATHER_SYNC_URL }}" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Key: ${{ secrets.SCORE_API_ADMIN_KEY }}" \
+            -d '{"edition":"2026"}'
+
+  sync-git:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Sync weather to public/data (dev / backup)
+        run: node scripts/2026/sync-weather.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/2026/weather.json public/data/2026/meta.json
+          if git diff --staged --quiet; then
+            echo "No weather changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(data): sync weather from Open-Meteo"
+          git push

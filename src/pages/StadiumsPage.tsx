@@ -15,7 +15,7 @@ export default function StadiumsPage() {
 
   const stadiums = data?.stadiums ?? [];
   const matches = data?.matches ?? [];
-  const weather = data?.weather ?? [];
+  const weather = data?.weather ?? { updatedAt: null, stadiums: {}, matches: {} };
 
   const countries = useMemo(
     () => ['all', ...Array.from(new Set(stadiums.map((s) => s.country))).sort()],
@@ -59,7 +59,17 @@ export default function StadiumsPage() {
 
       <div className="card-grid">
         {filtered.map((stadium) => {
-          const w = weather.find((w) => w.stadiumId === stadium.id);
+          const snap = weather.stadiums[stadium.id];
+          const w = snap
+            ? {
+                stadiumId: stadium.id,
+                city: snap.city ?? stadium.city,
+                temperatureF: snap.temperatureF,
+                condition: snap.condition,
+                wind: snap.wind,
+                updatedAt: snap.updatedAt,
+              }
+            : undefined;
           return (
             <StadiumCard
               key={stadium.id}

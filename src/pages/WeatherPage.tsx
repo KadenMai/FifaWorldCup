@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { stadiumWeatherList } from '../data/dataLoader';
 import { useT } from '../context/LanguageContext';
 import SearchBar from '../components/SearchBar';
 import WeatherCard from '../components/WeatherCard';
@@ -15,7 +16,9 @@ export default function WeatherPage() {
 
   const { weather, stadiums } = data;
 
-  const filtered = weather.filter((w) => {
+  const stadiumWeather = stadiumWeatherList(weather, stadiums);
+
+  const filtered = stadiumWeather.filter((w) => {
     if (!search) return true;
     const stadium = stadiums.find((s) => s.id === w.stadiumId);
     const q = search.toLowerCase();

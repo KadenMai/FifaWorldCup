@@ -72,6 +72,7 @@ export const en = {
     referee: 'Referee',
     lineups: 'Lineups',
     lineupsSoon: 'Lineups will be available closer to kickoff.',
+    weatherAtKickoff: 'Weather at kickoff',
     notFound: 'Match not found.',
     filter: {
       all: 'All',
@@ -175,7 +176,7 @@ export const en = {
   },
   weather: {
     title: 'Weather',
-    subtitle: 'Stadium weather conditions (manually updated)',
+    subtitle: 'Current stadium conditions (updated every 5 minutes via Open-Meteo)',
     searchPlaceholder: 'Search by city or stadium...',
     notUpdated: 'Not updated',
   },
@@ -265,6 +266,7 @@ export const vi: TranslationDict = {
     referee: 'Trọng tài',
     lineups: 'Đội hình',
     lineupsSoon: 'Đội hình sẽ được cập nhật gần giờ thi đấu.',
+    weatherAtKickoff: 'Thời tiết lúc thi đấu',
     notFound: 'Không tìm thấy trận đấu.',
     filter: {
       all: 'Tất cả',
@@ -368,7 +370,7 @@ export const vi: TranslationDict = {
   },
   weather: {
     title: 'Thời tiết',
-    subtitle: 'Thời tiết tại sân (cập nhật thủ công)',
+    subtitle: 'Thời tiết hiện tại tại sân (cập nhật mỗi 5 phút qua Open-Meteo)',
     searchPlaceholder: 'Tìm theo thành phố hoặc sân...',
     notUpdated: 'Chưa cập nhật',
   },
