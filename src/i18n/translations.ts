@@ -15,7 +15,6 @@ export const en = {
     coaches: 'Coaches',
     locations: 'Locations',
     venues: 'Venues',
-    weather: 'Weather',
     bracket: 'Bracket',
   },
   editions: {
@@ -39,7 +38,6 @@ export const en = {
     notFound: 'Not found',
     updated: 'Updated',
     capacity: 'Capacity',
-    wind: 'Wind',
   },
   hub: {
     noMatches: 'No matches scheduled.',
@@ -72,7 +70,6 @@ export const en = {
     referee: 'Referee',
     lineups: 'Lineups',
     lineupsSoon: 'Lineups will be available closer to kickoff.',
-    weatherAtKickoff: 'Weather at kickoff',
     notFound: 'Match not found.',
     filter: {
       all: 'All',
@@ -175,12 +172,6 @@ export const en = {
     mapZoomReset: 'Reset zoom',
     matchesHosted: '{{count}} matches',
   },
-  weather: {
-    title: 'Weather',
-    subtitle: 'Current stadium conditions (updated every 5 minutes via Open-Meteo)',
-    searchPlaceholder: 'Search by city or stadium...',
-    notUpdated: 'Not updated',
-  },
   positions: {
     Forward: 'Forward',
     Midfielder: 'Midfielder',
@@ -210,7 +201,6 @@ export const vi: TranslationDict = {
     coaches: 'Huấn luyện viên',
     locations: 'Địa điểm',
     venues: 'Sân vận động',
-    weather: 'Thời tiết',
     bracket: 'Vòng knock-out',
   },
   editions: {
@@ -234,7 +224,6 @@ export const vi: TranslationDict = {
     notFound: 'Không tìm thấy',
     updated: 'Cập nhật',
     capacity: 'Sức chứa',
-    wind: 'Gió',
   },
   hub: {
     noMatches: 'Không có trận đấu nào.',
@@ -267,7 +256,6 @@ export const vi: TranslationDict = {
     referee: 'Trọng tài',
     lineups: 'Đội hình',
     lineupsSoon: 'Đội hình sẽ được cập nhật gần giờ thi đấu.',
-    weatherAtKickoff: 'Thời tiết lúc thi đấu',
     notFound: 'Không tìm thấy trận đấu.',
     filter: {
       all: 'Tất cả',
@@ -369,12 +357,6 @@ export const vi: TranslationDict = {
     mapZoomOut: 'Thu nhỏ',
     mapZoomReset: 'Đặt lại zoom',
     matchesHosted: '{{count}} trận',
-  },
-  weather: {
-    title: 'Thời tiết',
-    subtitle: 'Thời tiết hiện tại tại sân (cập nhật mỗi 5 phút qua Open-Meteo)',
-    searchPlaceholder: 'Tìm theo thành phố hoặc sân...',
-    notUpdated: 'Chưa cập nhật',
   },
   positions: {
     Forward: 'Tiền đạo',

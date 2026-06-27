@@ -31,15 +31,6 @@ export interface Coach {
   notes?: string;
 }
 
-export interface MatchWeather {
-  temperatureF?: number | null;
-  condition?: string;
-  wind?: string | null;
-  atKickoff?: string;
-  fetchedAt?: string;
-  source?: 'archive' | 'forecast' | 'current';
-}
-
 export interface Match {
   id: string;
   date: string;
@@ -80,30 +71,4 @@ export interface Standing {
   goalsAgainst: number;
   goalDifference: number;
   points: number;
-}
-
-export interface WeatherSnapshot {
-  temperatureF?: number | null;
-  condition?: string;
-  wind?: string | null;
-  updatedAt?: string | null;
-  atKickoff?: string;
-  fetchedAt?: string;
-  source?: 'archive' | 'forecast';
-  city?: string;
-}
-
-export interface EditionWeatherData {
-  updatedAt: string | null;
-  stadiums: Record<string, WeatherSnapshot>;
-  matches: Record<string, WeatherSnapshot>;
-}
-
-export interface WeatherInfo {
-  stadiumId: string;
-  city: string;
-  temperatureF?: number | null;
-  condition?: string;
-  wind?: string | null;
-  updatedAt?: string | null;
 }

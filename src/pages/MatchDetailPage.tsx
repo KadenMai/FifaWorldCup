@@ -5,7 +5,6 @@ import { useEditionPath } from '../context/EditionContext';
 import { useLanguage, useT } from '../context/LanguageContext';
 import GoogleSportsPanel from '../components/GoogleSportsPanel';
 import MatchScoreModal from '../components/MatchScoreModal';
-import WeatherCard from '../components/WeatherCard';
 import { ErrorState, LoadingState } from '../components/PageState';
 import TeamFlag from '../components/TeamFlag';
 import { formatDate, formatMatchTime, getMatchWinner, getTeamById, translateMatchRound, formatStadiumLabel } from '../utils/helpers';
@@ -22,7 +21,7 @@ export default function MatchDetailPage() {
   if (loading) return <LoadingState />;
   if (error || !data) return <ErrorState message={error ?? undefined} />;
 
-  const { teams, matches, stadiums, weather } = data;
+  const { teams, matches, stadiums } = data;
   const rawMatch = matches.find((m) => m.id === matchId);
 
   if (!rawMatch) {
@@ -44,7 +43,6 @@ export default function MatchDetailPage() {
   const homeShort = home?.shortName ?? tbd;
   const awayShort = away?.shortName ?? tbd;
   const stadium = stadiums.find((s) => s.id === match.stadiumId);
-  const kickoffWeather = weather.matches[match.id];
   const winner = getMatchWinner(match, teams);
   const isLive = match.status === 'Live';
 
@@ -158,24 +156,6 @@ export default function MatchDetailPage() {
           {t('match.lineupsSoon')}
         </p>
       </div>
-
-      {kickoffWeather && stadium && (
-        <div style={{ marginTop: 16 }}>
-          <WeatherCard
-            weather={{
-              stadiumId: stadium.id,
-              city: stadium.city,
-              temperatureF: kickoffWeather.temperatureF,
-              condition: kickoffWeather.condition,
-              wind: kickoffWeather.wind,
-              updatedAt: kickoffWeather.atKickoff ?? kickoffWeather.fetchedAt,
-            }}
-            stadium={stadium}
-            title={t('match.weatherAtKickoff')}
-            updatedLabel={t('match.kickoff')}
-          />
-        </div>
-      )}
 
       <MatchScoreModal
         match={match}

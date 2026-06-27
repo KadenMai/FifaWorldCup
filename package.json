@@ -8,7 +8,6 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "update:match": "python scripts/manual_update_match.py",
-    "sync:weather": "node scripts/2026/sync-weather.mjs",
     "seed:r2": "node scripts/seed-r2.mjs",
     "pages:dev": "npm run build && npx wrangler pages dev dist"
   },

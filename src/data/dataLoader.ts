@@ -1,12 +1,10 @@
 import type {
   Coach,
-  EditionWeatherData,
   Match,
   Player,
   Stadium,
   Standing,
   Team,
-  WeatherInfo,
 } from '../types';
 import { fetchJson } from '../utils/fetchJson';
 
@@ -69,7 +67,7 @@ export async function loadAllData(edition: string) {
   const meta = await loadEditionMeta(edition);
   setRuntimeDataVersion(meta.dataVersion);
 
-  const [teams, players, coaches, matches, stadiums, standings, weatherRaw] =
+  const [teams, players, coaches, matches, stadiums, standings] =
     await Promise.all([
       loadJson<Team[]>(edition, 'teams.json'),
       loadJson<Player[]>(edition, 'players.json'),
@@ -77,56 +75,9 @@ export async function loadAllData(edition: string) {
       loadJson<Match[]>(edition, 'matches.json'),
       loadJson<Stadium[]>(edition, 'stadiums.json'),
       loadJson<Standing[]>(edition, 'standings.json'),
-      loadJson<EditionWeatherData | WeatherInfo[]>(edition, 'weather.json'),
     ]);
 
-  const weather = normalizeWeatherData(weatherRaw);
-
-  return { meta, teams, players, coaches, matches, stadiums, standings, weather };
-}
-
-/** Support legacy array weather.json and new { stadiums, matches } shape. */
-function normalizeWeatherData(
-  raw: EditionWeatherData | WeatherInfo[] | null | undefined,
-): EditionWeatherData {
-  if (!raw) {
-    return { updatedAt: null, stadiums: {}, matches: {} };
-  }
-  if (Array.isArray(raw)) {
-    const stadiumMap: EditionWeatherData['stadiums'] = {};
-    for (const entry of raw) {
-      if (entry?.stadiumId) {
-        const { stadiumId, ...rest } = entry;
-        stadiumMap[stadiumId] = rest;
-      }
-    }
-    return { updatedAt: null, stadiums: stadiumMap, matches: {} };
-  }
-  return {
-    updatedAt: raw.updatedAt ?? null,
-    stadiums: raw.stadiums ?? {},
-    matches: raw.matches ?? {},
-  };
-}
-
-export function stadiumWeatherList(
-  weather: EditionWeatherData,
-  stadiums: Stadium[],
-): WeatherInfo[] {
-  return stadiums.flatMap((stadium) => {
-    const snap = weather.stadiums[stadium.id];
-    if (!snap) return [];
-    return [
-      {
-        stadiumId: stadium.id,
-        city: snap.city ?? stadium.city,
-        temperatureF: snap.temperatureF,
-        condition: snap.condition,
-        wind: snap.wind,
-        updatedAt: snap.updatedAt,
-      },
-    ];
-  });
+  return { meta, teams, players, coaches, matches, stadiums, standings };
 }
 
 export type AppData = Awaited<ReturnType<typeof loadAllData>>;

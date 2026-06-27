@@ -36,7 +36,6 @@ The app should show all useful FIFA World Cup 2026 information:
 - Group standings / points table
 - Stadiums / locations
 - Match time by local timezone
-- Weather placeholder by stadium/city
 - Search and filters
 - Mobile bottom navigation bar
 
@@ -56,7 +55,6 @@ src/
     SearchBar.tsx
     FilterTabs.tsx
     StandingsTable.tsx
-    WeatherCard.tsx
   pages/
     HomePage.tsx
     TodayGamesPage.tsx
@@ -67,7 +65,6 @@ src/
     StadiumsPage.tsx
     StandingsPage.tsx
     MatchDetailPage.tsx
-    WeatherPage.tsx
   data/
     dataLoader.ts
   types/
@@ -85,7 +82,6 @@ public/
     matches.json
     stadiums.json
     standings.json
-    weather.json
 ```
 
 ## Main Navigation
@@ -97,7 +93,6 @@ Mobile navigation should have a fixed bottom bar with 5 common buttons:
 2. Teams
 3. Coaches
 4. Locations
-5. Weather
 
 Use simple icons if available, but text is enough.
 
@@ -134,7 +129,6 @@ Show:
   - Matches
   - Standings
   - Stadiums
-  - Weather
 
 ### 2. Today Games Page
 Route: `/today`
@@ -248,7 +242,6 @@ Stadium card should show:
 - Country
 - Capacity if available
 - Matches hosted
-- Weather summary placeholder
 
 ### 8. Standings Page
 Route: `/standings`
@@ -284,23 +277,6 @@ Show:
 - Match status
 - Referee if available
 - Team lineups placeholder
-- Related weather
-
-### 10. Weather Page
-Route: `/weather`
-
-Because this is a static app, use `weather.json` as a placeholder or manually updated file.
-
-Show:
-
-- City
-- Stadium
-- Temperature
-- Condition
-- Wind
-- Updated date/time
-
-Important: do not call a paid weather API unless configured later.
 
 ## Data Files
 
@@ -421,21 +397,6 @@ Cancelled
 ]
 ```
 
-### `/public/data/weather.json`
-
-```json
-[
-  {
-    "stadiumId": "sofi-stadium",
-    "city": "Inglewood",
-    "temperatureF": null,
-    "condition": "Not updated",
-    "wind": null,
-    "updatedAt": null
-  }
-]
-```
-
 ## TypeScript Types
 Create `src/types/index.ts`:
 
@@ -511,15 +472,6 @@ export interface Standing {
   goalsAgainst: number;
   goalDifference: number;
   points: number;
-}
-
-export interface WeatherInfo {
-  stadiumId: string;
-  city: string;
-  temperatureF?: number | null;
-  condition?: string;
-  wind?: string | null;
-  updatedAt?: string | null;
 }
 ```
 

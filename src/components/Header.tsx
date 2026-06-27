@@ -16,7 +16,6 @@ export default function Header() {
     { to: path('/coaches'), label: t('nav.coaches') },
     { to: path('/locations'), label: t('nav.locations') },
     { to: path('/standings'), label: t('nav.standings') },
-    { to: path('/weather'), label: t('nav.weather') },
   ];
 
   const isActive = (to: string) => {
@@ -62,7 +61,6 @@ export function BottomNav() {
     { to: path('/standings'), label: t('nav.standings'), icon: '📊' },
     { to: path('/teams'), label: t('nav.teams'), icon: '🏳️' },
     { to: path('/locations'), label: t('nav.venues'), icon: '🏟️' },
-    { to: path('/weather'), label: t('nav.weather'), icon: '🌤️' },
   ];
 
   const isBottomNavActive = (to: string) => {

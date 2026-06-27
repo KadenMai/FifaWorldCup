@@ -11,7 +11,6 @@ import CoachesPage from './pages/CoachesPage';
 import StadiumsPage from './pages/StadiumsPage';
 import StandingsPage from './pages/StandingsPage';
 import MatchDetailPage from './pages/MatchDetailPage';
-import WeatherPage from './pages/WeatherPage';
 
 export default function App() {
   return (
@@ -29,7 +28,6 @@ export default function App() {
             <Route path="locations" element={<StadiumsPage />} />
             <Route path="standings" element={<StandingsPage />} />
             <Route path="matches/:matchId" element={<MatchDetailPage />} />
-            <Route path="weather" element={<WeatherPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
