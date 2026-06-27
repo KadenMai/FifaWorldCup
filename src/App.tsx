@@ -10,6 +10,7 @@ import PlayersPage from './pages/PlayersPage';
 import CoachesPage from './pages/CoachesPage';
 import StadiumsPage from './pages/StadiumsPage';
 import StandingsPage from './pages/StandingsPage';
+import RulesPage from './pages/RulesPage';
 import MatchDetailPage from './pages/MatchDetailPage';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="coaches" element={<CoachesPage />} />
             <Route path="locations" element={<StadiumsPage />} />
             <Route path="standings" element={<StandingsPage />} />
+            <Route path="rules" element={<RulesPage />} />
             <Route path="matches/:matchId" element={<MatchDetailPage />} />
           </Route>
         </Routes>
