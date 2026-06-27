@@ -1,6 +1,6 @@
 import type { Match, Team } from '../types';
 import { computeStandingsFromMatches, getGroupsFromTeams, sortStandings } from './helpers';
-import { rankThirdPlaceTeams } from './thirdPlaceRanking';
+import { getThirdPlaceCandidates, isThirdPlaceKnockoutConfirmed } from './thirdPlaceRanking';
 
 /** True when every group-stage match in this group is Finished (6/6 for 2026). */
 export function isGroupStageComplete(group: string, groupMatches: Match[]): boolean {
@@ -19,7 +19,7 @@ export function areAllGroupsComplete(teams: Team[], groupMatches: Match[]): bool
   return groups.length > 0 && groups.every((g) => isGroupStageComplete(g, groupMatches));
 }
 
-/** Teams that are guaranteed knockout qualifiers (finished group top 2, or top-8 third when all groups done). */
+/** Teams that are guaranteed knockout qualifiers (finished group top 2, or confirmed top-8 third). */
 export function getConfirmedKnockoutTeamIds(teams: Team[], matches: Match[]): Set<string> {
   const groupMatches = matches.filter((m) => m.group);
   const confirmed = new Set<string>();
@@ -34,8 +34,10 @@ export function getConfirmedKnockoutTeamIds(teams: Team[], matches: Match[]): Se
     if (sorted[1]) confirmed.add(sorted[1].teamId);
   }
 
-  for (const candidate of rankThirdPlaceTeams(teams, groupMatches).slice(0, 8)) {
-    confirmed.add(candidate.teamId);
+  for (const candidate of getThirdPlaceCandidates(teams, groupMatches).slice(0, 8)) {
+    if (isThirdPlaceKnockoutConfirmed(candidate)) {
+      confirmed.add(candidate.teamId);
+    }
   }
 
   return confirmed;
