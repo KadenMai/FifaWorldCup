@@ -3,7 +3,8 @@ import type { Match, Standing, Team } from '../types';
 import { useEditionPath } from '../context/EditionContext';
 import { useT } from '../context/LanguageContext';
 import TeamFlag from './TeamFlag';
-import { FORM_MATCH_COUNT, type TeamFormData } from '../utils/standingsHelpers';
+import FormDots, { FORM_MATCH_COUNT } from './FormDots';
+import { type TeamFormData } from '../utils/standingsHelpers';
 import { getMergedGroupStandings, getTeamById } from '../utils/helpers';
 
 interface GoogleGroupTableProps {
@@ -13,24 +14,6 @@ interface GoogleGroupTableProps {
   matches: Match[];
   formMap: Map<string, TeamFormData>;
   confirmedKnockout: Set<string>;
-}
-
-function FormDots({ form, label }: { form: (string | null)[]; label: string }) {
-  return (
-    <div className="g-form-dots" aria-label={label}>
-      {form.map((r, i) => (
-        <span
-          key={i}
-          className={`g-form-dot${r ? ` g-form-${r.toLowerCase()}` : ' g-form-empty'}`}
-          title={r ?? ''}
-        >
-          {r === 'W' && '✓'}
-          {r === 'L' && '✕'}
-          {r === 'D' && '−'}
-        </span>
-      ))}
-    </div>
-  );
 }
 
 export default function GoogleGroupTable({

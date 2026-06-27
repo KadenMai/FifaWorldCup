@@ -305,6 +305,50 @@ a {
   padding: 16px;
 }
 
+.g-third-place-section {
+  padding: 0 16px 16px;
+}
+
+.g-third-place-table-wrap {
+  border-color: #c2e7ff;
+}
+
+.g-third-place-subtitle {
+  margin: 0;
+  padding: 0 14px 10px;
+  font-size: 0.8125rem;
+  color: var(--google-text-secondary);
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.g-third-place-footnote {
+  margin: 0;
+  padding: 10px 14px 12px;
+  font-size: 0.75rem;
+  color: var(--google-text-secondary);
+}
+
+.g-third-place-pending {
+  margin-left: 4px;
+  color: var(--google-text-secondary);
+  font-weight: 600;
+}
+
+.g-col-group {
+  width: 36px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--google-text-secondary);
+}
+
+.g-group-table tbody tr.g-row-third-out {
+  opacity: 0.72;
+}
+
+.g-standings-legend-note {
+  color: var(--google-text-secondary);
+}
+
 .g-group-table-wrap {
   border: 1px solid var(--google-border);
   border-radius: 8px;

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Match, Standing, Team } from '../types';
 import { useT } from '../context/LanguageContext';
 import GoogleGroupTable from './GoogleGroupTable';
+import GoogleThirdPlaceTable from './GoogleThirdPlaceTable';
 import { buildFormMap } from '../utils/standingsHelpers';
 import { getConfirmedKnockoutTeamIds } from '../utils/groupStageHelpers';
 
@@ -45,11 +46,14 @@ export default function GoogleStandings({
           />
         ))}
       </div>
+      <GoogleThirdPlaceTable teams={teams} matches={matches} formMap={formMap} />
       <div className="g-standings-legend">
         <span className="g-knockout-crown g-knockout-crown-legend" aria-hidden="true">
           👑
         </span>
         {t('standings.knockoutConfirmed')}
+        <span className="g-standings-legend-sep">·</span>
+        <span className="g-standings-legend-note">{t('standings.thirdPlaceLegend')}</span>
         <span className="g-standings-legend-sep">·</span>
         <span className="g-form-dot g-form-w g-form-legend">✓</span> {t('standings.win')}
         <span className="g-form-dot g-form-d g-form-legend">−</span> {t('standings.draw')}
