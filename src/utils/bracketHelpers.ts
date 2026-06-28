@@ -131,32 +131,24 @@ function resolveSlot(
   }
 }
 
-function getKnockoutWinner(matchId: number, matches: Match[]): string | null {
-  const data = matches.find((m) => m.id === formatMatchId(matchId));
-  if (!data || data.status !== 'Finished' || data.homeScore == null || data.awayScore == null) {
+function winnerFromScore(
+  stored: Match,
+  homeTeamId: string,
+  awayTeamId: string,
+): string | null {
+  if (stored.status !== 'Finished' || stored.homeScore == null || stored.awayScore == null) {
     return null;
   }
-  if (data.homeScore > data.awayScore) return data.homeTeamId;
-  if (data.awayScore > data.homeScore) return data.awayTeamId;
-  // Penalty shootout winner stored in notes, e.g. "Pens: home" or team id
-  const notes = data.notes?.toLowerCase() ?? '';
-  if (notes.includes('pen') && notes.includes('home')) return data.homeTeamId;
-  if (notes.includes('pen') && notes.includes('away')) return data.awayTeamId;
+  if (stored.homeScore > stored.awayScore) return homeTeamId;
+  if (stored.awayScore > stored.homeScore) return awayTeamId;
+  const notes = stored.notes?.toLowerCase() ?? '';
+  if (notes.includes('pen') && notes.includes('home')) return homeTeamId;
+  if (notes.includes('pen') && notes.includes('away')) return awayTeamId;
   if (notes.startsWith('winner:')) {
-    const winnerId = data.notes!.slice('winner:'.length).trim();
-    if (winnerId === data.homeTeamId || winnerId === data.awayTeamId) return winnerId;
+    const winnerId = stored.notes!.slice('winner:'.length).trim();
+    if (winnerId === homeTeamId || winnerId === awayTeamId) return winnerId;
   }
   return null;
-}
-
-function getKnockoutLoser(matchId: number, matches: Match[]): string | null {
-  const data = matches.find((m) => m.id === formatMatchId(matchId));
-  if (!data || data.status !== 'Finished' || data.homeScore == null || data.awayScore == null) {
-    return null;
-  }
-  const winner = getKnockoutWinner(matchId, matches);
-  if (!winner) return null;
-  return winner === data.homeTeamId ? data.awayTeamId : data.homeTeamId;
 }
 
 export function resolveBracket(
@@ -169,16 +161,24 @@ export function resolveBracket(
   const qualifyingThirdGroups = qualifyingThirdPlaceGroups(teams, groupMatches);
   const knockoutResults = new Map<number, string>();
   const knockoutLosers = new Map<number, string>();
-
-  for (const fixture of KNOCKOUT_FIXTURES) {
-    const winner = getKnockoutWinner(fixture.id, knockoutMatches);
-    const loser = getKnockoutLoser(fixture.id, knockoutMatches);
-    if (winner) knockoutResults.set(fixture.id, winner);
-    if (loser) knockoutLosers.set(fixture.id, loser);
-  }
+  const storedById = new Map(knockoutMatches.map((m) => [m.id, m]));
 
   const resolve = (slot: BracketSlot) =>
     resolveSlot(slot, placements, knockoutResults, knockoutLosers, qualifyingThirdGroups, completedGroups);
+
+  // Process fixtures in bracket order so winner-of slots see prior round results.
+  for (const fixture of KNOCKOUT_FIXTURES) {
+    const stored = storedById.get(formatMatchId(fixture.id));
+    const homeTeamId = resolve(fixture.home);
+    const awayTeamId = resolve(fixture.away);
+    if (!stored || !homeTeamId || !awayTeamId) continue;
+
+    const winner = winnerFromScore(stored, homeTeamId, awayTeamId);
+    if (winner) {
+      knockoutResults.set(fixture.id, winner);
+      knockoutLosers.set(fixture.id, winner === homeTeamId ? awayTeamId : homeTeamId);
+    }
+  }
 
   return KNOCKOUT_FIXTURES.map((fixture) => ({
     id: fixture.id,
