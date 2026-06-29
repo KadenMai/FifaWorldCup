@@ -239,15 +239,33 @@ export function countResolvedTeamMatches(teamId: string, teams: Team[], matches:
   return getMatchesForTeam(teamId, teams, matches).length;
 }
 
+/** R32 card order so each adjacent pair feeds one R16 match (FIFA bracket tree). */
+const R32_BRACKET_DISPLAY_ORDER: number[] = [
+  74, 77, // → R16 match 89
+  73, 75, // → R16 match 90
+  76, 78, // → R16 match 91
+  79, 80, // → R16 match 92
+  83, 84, // → R16 match 93
+  81, 82, // → R16 match 94
+  86, 88, // → R16 match 95
+  85, 87, // → R16 match 96
+];
+
+function sortR32BracketMatches(matches: ResolvedBracketMatch[]): ResolvedBracketMatch[] {
+  const order = new Map(R32_BRACKET_DISPLAY_ORDER.map((id, idx) => [id, idx]));
+  return [...matches].sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
+}
+
 export function getBracketMatchesByRound(
   resolved: ResolvedBracketMatch[]
 ): Map<BracketRound, ResolvedBracketMatch[]> {
   const map = new Map<BracketRound, ResolvedBracketMatch[]>();
   for (const round of BRACKET_ROUNDS) {
-    map.set(
-      round,
-      resolved.filter((m) => m.round === round)
-    );
+    let matches = resolved.filter((m) => m.round === round);
+    if (round === 'r32') {
+      matches = sortR32BracketMatches(matches);
+    }
+    map.set(round, matches);
   }
   return map;
 }
