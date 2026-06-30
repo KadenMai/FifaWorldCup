@@ -111,6 +111,19 @@ Redeploy after pushing so Pages picks up the binding.
 npm run seed:r2
 ```
 
+**Sync R2 ↔ local:**
+
+| Command | Direction |
+|---------|-----------|
+| `npm run seed:r2` | `public/data/**` → R2 (push local to production) |
+| `npm run pull:r2` | R2 → `public/data/**` (download live scores for local dev) |
+
+Requires `npx wrangler login`. Default bucket: `fifaworldcup-data` (override with `R2_BUCKET`). `pull:r2` only fetches keys that already exist under `public/data/` (walks the local tree). For local Miniflare during `pages:dev`, add `--local`:
+
+```powershell
+npm run pull:r2 -- --local
+```
+
 4. **Environment variables** (Production):
 
 | Name | Value |
@@ -135,7 +148,7 @@ npm run pages:dev
 # Uses static /data/ unless you set VITE_DATA_URL=/api/data/ in .env.local and re-build
 ```
 
-**Note:** Plain `npm run dev` still serves JSON from `public/data/` (no R2). Use `npm run pages:dev` to test score updates locally.
+**Note:** Plain `npm run dev` still serves JSON from `public/data/` (no R2). Use `npm run pages:dev` to test score updates locally. To refresh local JSON from production first: `npm run pull:r2`, then `npm run dev`.
 
 GitHub is still used for **source code** and optional script-based updates (`manual_update_match.py` → commit → redeploy refreshes static fallback in `dist/`).
 
@@ -432,6 +445,7 @@ See `scripts/2026/sync_api_football.py` and workflow `sync-api-football.yml` (di
 |--------|---------|
 | `scripts/manual_update_match.py` | Update one match locally (any edition via `--edition`) |
 | `scripts/seed-r2.mjs` | Upload `public/data/**` to Cloudflare R2 |
+| `scripts/pull-r2.mjs` | Download R2 `data/**` into `public/data/**` |
 | `scripts/2026/generate-data.mjs` | Regenerate 2026 seed data |
 | `scripts/2026/generate-knockout-matches.mjs` | Append 2026 knockout fixtures |
 | `scripts/2026/sync-espn-kickoffs.mjs` | Sync 2026 group-stage kickoffs from ESPN |
